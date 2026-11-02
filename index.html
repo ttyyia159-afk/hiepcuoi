@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thiệp Mời Đám Cưới - Văn Nam & Thu Hà</title>
+    <style>
+        :root {
+            --bg-color: #fdfbf7;
+            --card-bg: #ffffff;
+            --primary-color: #8b0000;
+            --text-color: #333333;
+            --border-color: #d4af37;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .wedding-card {
+            background-color: var(--card-bg);
+            max-width: 600px;
+            width: 100%;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .hero-image {
+            width: 100%;
+            max-height: 350px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            font-size: 2em;
+            margin-top: 20px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            font-size: 1.1em;
+            font-style: italic;
+            color: #666;
+        }
+
+        .couple-names {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 20px 0;
+        }
+
+        .details-section {
+            background-color: #fcf8f2;
+            border-left: 4px solid var(--border-color);
+            padding: 15px 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+
+        .details-section h2 {
+            margin-top: 0;
+            color: var(--primary-color);
+            font-size: 1.3em;
+        }
+
+        .details-section ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .details-section li {
+            margin-bottom: 10px;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .footer-text {
+            font-size: 1.1em;
+            font-weight: bold;
+            margin-top: 25px;
+            color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+
+    <main class="wedding-card" role="main" aria-label="Thiệp mời đám cưới của Văn Nam và Thu Hà">
+        
+        <!-- Ảnh cục bộ từ file của bạn, tối ưu tốc độ bằng loading="lazy" -->
+        <img src="anh-cuoi.jpg" 
+             alt="Hình ảnh cô dâu và chú rể mỉm cười nắm tay nhau trong trang phục cưới truyền thống, phía sau là phông nền hoa hồng đỏ và đèn trang trí lấp lánh." 
+             class="hero-image"
+             loading="lazy">
+
+        <header>
+            <p class="subtitle">Trân trọng kính mời quý khách đến dự</p>
+            <h1>LỄ THÀNH HÔN</h1>
+        </header>
+
+        <section aria-label="Tên cô dâu chú rể">
+            <div class="couple-names">
+                <span>Chú rể: Nguyễn Văn Nam</span>
+                <span aria-hidden="true"><br>&amp;<br></span>
+                <span class="sr-only"> và </span>
+                <span>Cô dâu: Trần Thu Hà</span>
+            </div>
+        </section>
+
+        <section class="details-section" aria-label="Thông tin thời gian và địa điểm">
+            <h2>Thời Gian &amp; Địa Điểm</h2>
+            <ul>
+                <li><strong>Thời gian:</strong> 11 giờ 00 phút, Chủ Nhật, ngày 20 tháng 12 năm 2026</li>
+                <li><strong>(Tức ngày):</strong> Ngày 12 tháng 11 năm Bính Ngọ (Âm lịch)</li>
+                <li><strong>Địa điểm:</strong> Trung tâm Hội nghị &amp; Tiệc cưới Luxury Palace</li>
+                <li><strong>Địa chỉ:</strong> Số 123 Đường Phố Hoa, Phường 5, Quận 1, TP. Hồ Chí Minh</li>
+            </ul>
+        </section>
+
+        <section class="details-section" aria-label="Thông tin gia đình hai bên">
+            <h2>Đại Diện Hai Họ</h2>
+            <div style="display: flex; justify-content: space-between; flex-wrap: wrap;">
+                <div>
+                    <p><strong>Nhà Trai:</strong></p>
+                    <p>Ông: Nguyễn Văn A<br>Bà: Lê Thị B</p>
+                </div>
+                <div>
+                    <p><strong>Nhà Gái:</strong></p>
+                    <p>Ông: Trần Văn C<br>Bà: Phạm Thị D</p>
+                </div>
+            </div>
+        </section>
+
+        <p class="footer-text">Rất hân hạnh được đón tiếp quý khách!</p>
+
+    </main>
+
+</body>
+</html>
