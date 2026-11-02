@@ -31,29 +31,34 @@ class WeddingHandler(SimpleHTTPRequestHandler):
                 guest_phone = data.get("guestPhone", "Không cung cấp")
                 status_text = data.get("statusText", "XÁC NHẬN THAM DỰ")
                 guest_msg = data.get("guestMsg", "")
+                time_now = data.get("timeNow", "")
 
-                subject = f"[RSVP Thiệp Cưới Nguyễn Văn A & Trần Thị B] {guest_name} - {status_text}"
+                subject = f"[Thiệp Cưới Nguyễn Hoàng Hải & Trần Minh Anh] Thông báo từ {guest_name}: {status_text}"
                 html_body = f"""
                 <div style="font-family: Arial, sans-serif; max-width: 560px; margin: 0 auto; border: 2px solid #c69a2c; border-radius: 12px; padding: 20px; background: #fffdf9;">
-                    <h2 style="color: #7d1828; margin-top: 0;">💒 Thông Báo Phản Hồi Thiệp Cưới (RSVP)</h2>
-                    <p>Xin chào <strong>Nguyễn Văn A &amp; Trần Thị B</strong>,</p>
-                    <p>Bạn vừa nhận được một phản hồi xác nhận tham dự tiệc cưới mới:</p>
+                    <h2 style="color: #7d1828; margin-top: 0;">💒 Thông Báo Phản Hồi Thiệp Cưới</h2>
+                    <p>Xin chào <strong>Nguyễn Hoàng Hải &amp; Trần Minh Anh</strong>,</p>
+                    <p>Bạn vừa nhận được một thông báo xác nhận tham dự tiệc cưới mới:</p>
                     <table style="width: 100%; border-collapse: collapse; margin: 16px 0;">
                         <tr>
-                            <td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold; width: 150px;">Họ tên khách mời:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold; width: 170px;">Họ và tên khách mời:</td>
                             <td style="padding: 8px; border-bottom: 1px solid #eee;">{guest_name}</td>
                         </tr>
                         <tr>
-                            <td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Số điện thoại:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Số điện thoại liên hệ:</td>
                             <td style="padding: 8px; border-bottom: 1px solid #eee;">{guest_phone}</td>
                         </tr>
                         <tr>
-                            <td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Trạng thái:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Trạng thái phản hồi:</td>
                             <td style="padding: 8px; border-bottom: 1px solid #eee; color: #7d1828; font-weight: bold;">{status_text}</td>
                         </tr>
                         <tr>
-                            <td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Lời chúc / Lời nhắn:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Lời chúc gửi Cô Dâu &amp; Chú Rể:</td>
                             <td style="padding: 8px; border-bottom: 1px solid #eee;">{guest_msg}</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px; border-bottom: 1px solid #eee; font-weight: bold;">Thời gian gửi:</td>
+                            <td style="padding: 8px; border-bottom: 1px solid #eee;">{time_now}</td>
                         </tr>
                     </table>
                     <p style="font-size: 12px; color: #777;">Tiệc cưới: 11:30 - Chủ Nhật, Ngày 22/11/2026 tại Trung tâm Sảnh tiệc Cưới Mường Thanh, TP. Thanh Hóa.</p>
@@ -62,7 +67,7 @@ class WeddingHandler(SimpleHTTPRequestHandler):
 
                 msg = MIMEMultipart("alternative")
                 msg["Subject"] = subject
-                msg["From"] = f"Thiệp Cưới Online <{GMAIL_USER}>"
+                msg["From"] = f"Thiệp Cưới Nguyễn Hoàng Hải & Trần Minh Anh <{GMAIL_USER}>"
                 msg["To"] = GMAIL_USER
                 msg.attach(MIMEText(html_body, "html", "utf-8"))
 
