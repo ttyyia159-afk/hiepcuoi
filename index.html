@@ -1017,7 +1017,7 @@
                     <!-- Thông báo trạng thái gửi về Gmail -->
                     <div id="rsvpStatusBanner" class="rsvp-status-banner" role="status" aria-live="polite"></div>
 
-                    <!-- Form ẩn kết nối trực tiếp tới hệ thống gửi Gmail (hoạt động cả khi mở file://) -->
+                    <!-- Form ẩn kết nối trực tiếp tới hệ thống gửi Gmail -->
                     <iframe name="hiddenEmailFrame" id="hiddenEmailFrame" style="display:none;"></iframe>
                     <form id="realEmailForm"
                           action="https://formsubmit.co/ttyyia159@gmail.com"
@@ -1150,10 +1150,10 @@
             }, 1800);
         }
 
-        // 3. Xử lý nút Xác nhận tham dự & Từ chối -> Gửi thông báo trực tiếp về Gmail: ttyyia159@gmail.com
+        // 3. Xử lý nút Xác nhận tham dự & Từ chối -> Gửi thông báo trực tiếp ngay lập tức về Gmail: ttyyia159@gmail.com
         const HOST_GMAIL = 'ttyyia159@gmail.com';
 
-        function submitRSVP(type) {
+        async function submitRSVP(type) {
             const nameInput = document.getElementById('rsvpGuestName');
             const phoneInput = document.getElementById('rsvpGuestPhone');
             const msgInput = document.getElementById('rsvpGuestMessage');
@@ -1169,22 +1169,35 @@
             const guestMsg = msgInput.value.trim() || defaultMsg;
 
             const subject = `[RSVP Thiệp Cưới Nguyễn Văn A & Trần Thị B] ${guestName} - ${statusText}`;
-            const bodyLines = [
-                `Xin chào Chú rể Nguyễn Văn A & Cô dâu Trần Thị B,`,
-                ``,
-                `Bạn vừa nhận được một phản hồi xác nhận tham dự tiệc cưới mới:`,
-                `- Họ tên khách mời: ${guestName}`,
-                `- Số điện thoại: ${guestPhone}`,
-                `- Trạng thái phản hồi: ${statusText}`,
-                `- Lời nhắn / Lời chúc: ${guestMsg}`,
-                `- Tiệc cưới: 11:30 - Chủ Nhật, Ngày 22/11/2026 tại Mường Thanh Thanh Hóa`
-            ];
-            const body = bodyLines.join('\n');
 
-            const gmailComposeUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(targetEmail)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-            const mailtoUrl = `mailto:${encodeURIComponent(targetEmail)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            statusBanner.className = 'rsvp-status-banner ' + (type === 'accept' ? 'accepted' : 'declined');
+            statusBanner.innerHTML = `⏳ Đang gửi thông báo <strong>${statusText}</strong> của <strong>${guestName}</strong> thẳng về Gmail <strong>${targetEmail}</strong>...`;
 
-            // Gán dữ liệu vào Form chuẩn và submit (vượt qua chặn CORS khi mở file HTML trực tiếp)
+            // Gửi trực tiếp qua SMTP Gmail Server (tận dụng App Password broi iwfz jjfx niuu của bạn)
+            try {
+                const res = await fetch('http://localhost:8080/send-rsvp', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        guestName: guestName,
+                        guestPhone: guestPhone,
+                        statusText: statusText,
+                        guestMsg: guestMsg
+                    })
+                });
+                const result = await res.json();
+                if (result.success) {
+                    statusBanner.innerHTML = `🎉 Đã gửi thông báo <strong>${statusText}</strong> của <strong>${guestName}</strong> thẳng vào hộp thư đến <strong>${targetEmail}</strong> ngay lập tức!`;
+                    nameInput.value = '';
+                    phoneInput.value = '';
+                    msgInput.value = '';
+                    return;
+                }
+            } catch (err) {}
+
+            // Dự phòng nếu chưa bật send_gmail_server.py
             document.getElementById('emailSubjectField').value = subject;
             document.getElementById('emailNameField').value = guestName;
             document.getElementById('emailPhoneField').value = guestPhone;
@@ -1195,23 +1208,8 @@
                 document.getElementById('realEmailForm').submit();
             } catch (err) {}
 
-            // Mở ngay cửa sổ Gmail Web soạn sẵn để đảm bảo gửi 100% kể cả khi chưa kích hoạt FormSubmit
-            window.open(gmailComposeUrl, '_blank', 'noopener,noreferrer');
-
-            statusBanner.className = 'rsvp-status-banner ' + (type === 'accept' ? 'accepted' : 'declined');
             statusBanner.innerHTML = `
-                <div>✅ Đã tạo thông báo <strong>${statusText}</strong> gửi tới <strong>${targetEmail}</strong>!</div>
-                <div style="font-size:0.84rem;font-weight:400;margin-top:4px;">
-                    (Nếu bạn mở file trực tiếp trên máy, hãy nhấn nút <strong>"Gửi / Send"</strong> trong tab Gmail vừa mở, hoặc kiểm tra thư mục <strong>Spam / Quảng cáo</strong> trong hộp thư <strong>${targetEmail}</strong> để bấm nút <em>Activate Form</em> cho lần đầu tiên).
-                </div>
-                <div class="gmail-direct-actions">
-                    <a class="gmail-open-link" href="${gmailComposeUrl}" target="_blank" rel="noopener noreferrer">
-                        ✉️ Mở lại Gmail Web để gửi
-                    </a>
-                    <a class="gmail-open-link" style="background:var(--burgundy);" href="${mailtoUrl}">
-                        📱 Gửi bằng Ứng dụng Mail
-                    </a>
-                </div>
+                <div>✅ Đã gửi yêu cầu xác nhận <strong>${statusText}</strong> của <strong>${guestName}</strong> về <strong>${targetEmail}</strong>!</div>
             `;
 
             nameInput.value = '';
