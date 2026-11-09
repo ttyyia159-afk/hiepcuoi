@@ -1,1311 +1,226 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Thiệp Cưới Online — Nguyễn Hoàng Hải &amp; Trần Minh Anh (22.11.2026)</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,400;1,600&family=Great+Vibes&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --bg-cream: #fbf7f0;
-            --bg-card: #ffffff;
-            --bg-soft: #f6efe4;
-            --burgundy: #7d1828;
-            --burgundy-dark: #580f1b;
-            --gold: #c69a2c;
-            --gold-light: #e7d49c;
-            --gold-pale: #faf3de;
-            --green-accept: #1f7a4c;
-            --green-accept-dark: #165937;
-            --text-main: #2e2523;
-            --text-muted: #6e615d;
-            --radius-xl: 24px;
-            --radius-lg: 16px;
-            --radius-md: 12px;
-            --shadow-card: 0 22px 64px rgba(88, 15, 27, 0.13);
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: radial-gradient(circle at top, #fdfbf7 0%, #efe3d2 100%);
-            color: var(--text-main);
-            line-height: 1.65;
-            padding: 28px 12px 64px;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* Hiệu ứng cánh hoa rơi */
-        .petal-container {
-            position: fixed;
-            inset: 0;
-            pointer-events: none;
-            z-index: 99;
-            overflow: hidden;
-        }
-
-        .petal {
-            position: absolute;
-            top: -30px;
-            background: linear-gradient(135deg, #ffdce0, #ee9ca7);
-            border-radius: 150% 0 150% 0;
-            opacity: 0.65;
-            animation: fall linear infinite;
-        }
-
-        @keyframes fall {
-            0% {
-                transform: translateY(-20px) rotate(0deg) translateX(0);
-                opacity: 0.8;
-            }
-            50% {
-                transform: translateY(50vh) rotate(180deg) translateX(22px);
-            }
-            100% {
-                transform: translateY(105vh) rotate(360deg) translateX(-18px);
-                opacity: 0.1;
-            }
-        }
-
-        /* Khung thiệp chính */
-        .wedding-invitation {
-            max-width: 720px;
-            margin: 0 auto;
-            background: var(--bg-card);
-            border-radius: var(--radius-xl);
-            box-shadow: var(--shadow-card);
-            border: 1.5px solid var(--gold-light);
-            overflow: hidden;
-            position: relative;
-        }
-
-        .invitation-border {
-            margin: 12px;
-            border: 1.5px solid var(--gold-light);
-            border-radius: calc(var(--radius-xl) - 6px);
-            padding: 32px 24px 40px;
-            position: relative;
-            background:
-                radial-gradient(circle at 0% 0%, rgba(198, 154, 44, 0.07) 0%, transparent 35%),
-                radial-gradient(circle at 100% 100%, rgba(125, 24, 40, 0.06) 0%, transparent 35%);
-        }
-
-        /* Góc trang trí cổ điển */
-        .corner {
-            position: absolute;
-            width: 36px;
-            height: 36px;
-            border-color: var(--gold);
-            border-style: solid;
-            pointer-events: none;
-        }
-        .corner.tl { top: 10px; left: 10px; border-width: 2px 0 0 2px; border-top-left-radius: 8px; }
-        .corner.tr { top: 10px; right: 10px; border-width: 2px 2px 0 0; border-top-right-radius: 8px; }
-        .corner.bl { bottom: 10px; left: 10px; border-width: 0 0 2px 2px; border-bottom-left-radius: 8px; }
-        .corner.br { bottom: 10px; right: 10px; border-width: 0 2px 2px 0; border-bottom-right-radius: 8px; }
-
-        /* Phần đầu thiệp */
-        .top-label {
-            text-align: center;
-            text-transform: uppercase;
-            letter-spacing: 4px;
-            font-size: 0.78rem;
-            color: var(--gold);
-            font-weight: 700;
-            margin-bottom: 8px;
-        }
-
-        .invite-headline {
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            text-align: center;
-            font-size: 1.45rem;
-            font-weight: 700;
-            color: var(--burgundy);
-            max-width: 560px;
-            margin: 0 auto 22px;
-            line-height: 1.4;
-            padding: 14px 18px;
-            background: linear-gradient(180deg, #fffdf9 0%, #faf2e3 100%);
-            border: 1px solid var(--gold-light);
-            border-radius: var(--radius-md);
-        }
-
-        /* Khung ảnh chính */
-        .hero-banner {
-            position: relative;
-            border-radius: var(--radius-lg);
-            overflow: hidden;
-            border: 3px solid var(--gold-light);
-            box-shadow: 0 14px 32px rgba(0, 0, 0, 0.12);
-            margin-bottom: 28px;
-            background: #f3eadc;
-        }
-
-        .hero-banner img {
-            width: 100%;
-            height: 410px;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.8s ease;
-        }
-
-        .hero-banner:hover img {
-            transform: scale(1.03);
-        }
-
-        .hero-caption {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(45, 10, 18, 0.84) 0%, rgba(45, 10, 18, 0.25) 50%, transparent 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: flex-end;
-            align-items: center;
-            padding: 28px 18px;
-            text-align: center;
-            color: #fff;
-        }
-
-        .couple-script {
-            font-family: 'Great Vibes', cursive;
-            font-size: 3.1rem;
-            color: #fff9e8;
-            line-height: 1.15;
-            text-shadow: 0 3px 14px rgba(0, 0, 0, 0.45);
-            margin-bottom: 6px;
-        }
-
-        .wedding-date-pill {
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: 1.12rem;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            color: var(--gold-light);
-            font-weight: 600;
-            border-top: 1px solid rgba(231, 212, 156, 0.5);
-            padding-top: 6px;
-        }
-
-        /* Tiêu đề từng phần */
-        .section-block {
-            margin-bottom: 30px;
-        }
-
-        .section-header {
-            text-align: center;
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: 1.55rem;
-            font-weight: 700;
-            color: var(--burgundy);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .section-header::before,
-        .section-header::after {
-            content: "";
-            height: 1px;
-            width: 45px;
-            background: linear-gradient(90deg, transparent, var(--gold), transparent);
-        }
-
-        /* 1. Lời ngỏ */
-        .intro-card {
-            background: var(--bg-soft);
-            border: 1px solid var(--gold-light);
-            border-radius: var(--radius-lg);
-            padding: 22px 24px;
-            text-align: center;
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: 1.25rem;
-            font-style: italic;
-            color: #463936;
-            box-shadow: inset 0 0 0 4px #fffdf9;
-        }
-
-        /* 2. Thời gian & Địa điểm */
-        .couple-cards {
-            display: grid;
-            grid-template-columns: 1fr auto 1fr;
-            align-items: center;
-            gap: 12px;
-            background: linear-gradient(180deg, #fffdf9 0%, #faf3e6 100%);
-            border: 1px solid var(--gold-light);
-            border-radius: var(--radius-lg);
-            padding: 20px 16px;
-            text-align: center;
-            margin-bottom: 18px;
-        }
-
-        .person-role {
-            font-size: 0.78rem;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--gold);
-            font-weight: 700;
-            display: block;
-            margin-bottom: 4px;
-        }
-
-        .person-fullname {
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: 1.8rem;
-            font-weight: 700;
-            color: var(--burgundy);
-            line-height: 1.2;
-        }
-
-        .heart-divider {
-            font-family: 'Great Vibes', cursive;
-            font-size: 2.5rem;
-            color: var(--gold);
-            padding: 0 6px;
-        }
-
-        /* Đồng hồ đếm ngược */
-        .countdown-row {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 10px;
-            margin: 16px 0 20px;
-        }
-
-        .cd-box {
-            background: var(--burgundy);
-            color: #fff;
-            border-radius: var(--radius-md);
-            padding: 12px 6px;
-            text-align: center;
-            border: 1px solid var(--gold);
-            box-shadow: 0 6px 16px rgba(125, 24, 40, 0.2);
-        }
-
-        .cd-num {
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: 1.85rem;
-            font-weight: 700;
-            color: #fff9e6;
-            line-height: 1;
-            display: block;
-        }
-
-        .cd-txt {
-            font-size: 0.74rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--gold-light);
-            margin-top: 4px;
-            display: block;
-        }
-
-        .venue-card {
-            background: var(--bg-soft);
-            border-left: 4px solid var(--burgundy);
-            border-radius: var(--radius-md);
-            padding: 20px 22px;
-            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.04);
-        }
-
-        .venue-list {
-            list-style: none;
-            font-size: 0.96rem;
-        }
-
-        .venue-list li {
-            margin-bottom: 10px;
-            display: flex;
-            align-items: baseline;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-
-        .venue-list li strong {
-            color: var(--burgundy-dark);
-            min-width: 155px;
-        }
-
-        .map-link-btn {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            margin-top: 10px;
-            padding: 10px 20px;
-            background: var(--burgundy);
-            color: #fff;
-            border-radius: 999px;
-            text-decoration: none;
-            font-weight: 600;
-            font-size: 0.9rem;
-            box-shadow: 0 6px 16px rgba(125, 24, 40, 0.25);
-            transition: transform 0.2s ease, background 0.2s ease;
-        }
-
-        .map-link-btn:hover {
-            transform: translateY(-2px);
-            background: var(--burgundy-dark);
-        }
-
-        /* 3. Mừng hạnh phúc / Gửi quà từ xa */
-        .gift-card {
-            background: linear-gradient(180deg, #fffdf9 0%, #fbf3e4 100%);
-            border: 1.5px dashed var(--gold);
-            border-radius: var(--radius-lg);
-            padding: 22px;
-            text-align: center;
-        }
-
-        .gift-lead {
-            font-size: 0.95rem;
-            color: var(--text-muted);
-            margin-bottom: 18px;
-        }
-
-        .bank-details-box {
-            background: #fff;
-            border: 1px solid var(--gold-light);
-            border-radius: var(--radius-md);
-            padding: 16px 18px;
-            text-align: left;
-            max-width: 540px;
-            margin: 0 auto 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-        }
-
-        .bank-row {
-            margin-bottom: 8px;
-            font-size: 0.95rem;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 8px;
-            border-bottom: 1px dashed #eee2ce;
-            padding-bottom: 8px;
-        }
-
-        .bank-row:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-
-        .bank-row strong {
-            color: var(--burgundy-dark);
-        }
-
-        .copy-inline-btn {
-            background: var(--gold-pale);
-            border: 1px solid var(--gold);
-            color: var(--burgundy-dark);
-            padding: 4px 11px;
-            border-radius: 99px;
-            font-size: 0.78rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-
-        .copy-inline-btn:hover {
-            background: var(--gold);
-            color: #fff;
-        }
-
-        .qr-wrapper {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-            margin-top: 12px;
-        }
-
-        .qr-note {
-            font-size: 0.88rem;
-            font-style: italic;
-            color: var(--burgundy);
-            font-weight: 600;
-        }
-
-        .qr-frame {
-            background: #fff;
-            border: 2px solid var(--gold);
-            border-radius: var(--radius-md);
-            padding: 14px;
-            width: 230px;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
-            text-align: center;
-        }
-
-        .qr-frame img {
-            width: 100%;
-            height: 190px;
-            object-fit: contain;
-            border-radius: 8px;
-            display: block;
-            margin-bottom: 8px;
-            background: #faf6ef;
-        }
-
-        .qr-placeholder-tag {
-            font-size: 0.78rem;
-            color: var(--text-muted);
-            display: block;
-            margin-bottom: 8px;
-        }
-
-        .upload-qr-label {
-            display: inline-block;
-            background: var(--gold-pale);
-            color: var(--burgundy-dark);
-            border: 1px solid var(--gold);
-            padding: 6px 12px;
-            border-radius: 99px;
-            font-size: 0.78rem;
-            font-weight: 600;
-            cursor: pointer;
-        }
-
-        .upload-qr-label input {
-            display: none;
-        }
-
-        /* 4. Xác nhận sự tham dự (RSVP) */
-        .rsvp-card {
-            background: var(--bg-soft);
-            border: 1px solid var(--gold-light);
-            border-radius: var(--radius-lg);
-            padding: 24px 22px;
-        }
-
-        .rsvp-intro {
-            text-align: center;
-            font-size: 0.96rem;
-            color: var(--text-main);
-            margin-bottom: 16px;
-        }
-
-        .contact-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .contact-pill {
-            background: #fff;
-            border: 1px solid var(--gold-light);
-            border-radius: var(--radius-md);
-            padding: 12px 14px;
-            text-align: center;
-        }
-
-        .contact-pill span {
-            display: block;
-            font-size: 0.8rem;
-            color: var(--text-muted);
-            margin-bottom: 4px;
-        }
-
-        .contact-pill a {
-            color: var(--burgundy);
-            font-weight: 700;
-            font-size: 1.02rem;
-            text-decoration: none;
-        }
-
-        .rsvp-form-inputs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 12px;
-            margin-bottom: 14px;
-        }
-
-        .input-field {
-            width: 100%;
-            padding: 11px 14px;
-            border: 1px solid #d9c8ae;
-            border-radius: 10px;
-            font-family: inherit;
-            font-size: 0.94rem;
-            background: #fff;
-        }
-
-        .input-field:focus {
-            outline: none;
-            border-color: var(--burgundy);
-        }
-
-        .rsvp-textarea {
-            width: 100%;
-            padding: 11px 14px;
-            border: 1px solid #d9c8ae;
-            border-radius: 10px;
-            font-family: inherit;
-            font-size: 0.94rem;
-            background: #fff;
-            margin-bottom: 16px;
-            resize: vertical;
-        }
-
-        /* HAI NÚT XÁC NHẬN & TỪ CHỐI */
-        .rsvp-action-buttons {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 14px;
-            margin-bottom: 14px;
-        }
-
-        .btn-accept,
-        .btn-decline {
-            padding: 14px 18px;
-            border-radius: 999px;
-            font-size: 0.96rem;
-            font-weight: 700;
-            cursor: pointer;
-            border: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: transform 0.18s ease, box-shadow 0.18s ease;
-        }
-
-        .btn-accept {
-            background: linear-gradient(135deg, var(--green-accept), var(--green-accept-dark));
-            color: #fff;
-            box-shadow: 0 8px 20px rgba(31, 122, 76, 0.28);
-        }
-
-        .btn-accept:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 24px rgba(31, 122, 76, 0.36);
-        }
-
-        .btn-decline {
-            background: #fff;
-            color: var(--burgundy);
-            border: 2px solid var(--burgundy);
-            box-shadow: 0 6px 16px rgba(125, 24, 40, 0.12);
-        }
-
-        .btn-decline:hover {
-            background: var(--burgundy);
-            color: #fff;
-            transform: translateY(-2px);
-        }
-
-        .rsvp-status-banner {
-            display: none;
-            padding: 14px 18px;
-            border-radius: var(--radius-md);
-            font-weight: 600;
-            font-size: 0.95rem;
-            text-align: center;
-            margin-bottom: 20px;
-        }
-
-        .rsvp-status-banner.accepted {
-            display: block;
-            background: #e9f7ef;
-            color: #165937;
-            border: 1px solid #a3dfb9;
-        }
-
-        .rsvp-status-banner.declined {
-            display: block;
-            background: #fdf2f4;
-            color: var(--burgundy-dark);
-            border: 1px solid #f1bfc7;
-        }
-
-        /* KHU VỰC ẢNH VÀ VIDEO NGAY BÊN DƯỚI NÚT XÁC NHẬN & TỪ CHỐI */
-        .media-showcase-under-rsvp {
-            margin-top: 22px;
-            padding-top: 22px;
-            border-top: 1.5px dashed var(--gold);
-        }
-
-        .media-sub-title {
-            text-align: center;
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: var(--burgundy);
-            margin-bottom: 6px;
-        }
-
-        .media-sub-desc {
-            text-align: center;
-            font-size: 0.88rem;
-            color: var(--text-muted);
-            margin-bottom: 16px;
-        }
-
-        /* Album ảnh kỷ niệm */
-        .photo-gallery-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-
-        .gallery-card {
-            position: relative;
-            border-radius: var(--radius-md);
-            overflow: hidden;
-            border: 2px solid var(--gold-light);
-            background: #fff;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
-            aspect-ratio: 4 / 5;
-        }
-
-        .gallery-card img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.5s ease;
-        }
-
-        .gallery-card:hover img {
-            transform: scale(1.06);
-        }
-
-        .gallery-caption {
-            position: absolute;
-            bottom: 0;
-            inset-inline: 0;
-            background: linear-gradient(to top, rgba(0, 0, 0, 0.72), transparent);
-            color: #fff;
-            font-size: 0.78rem;
-            padding: 18px 8px 8px;
-            text-align: center;
-        }
-
-        /* Khung Video kỷ niệm ngày cưới */
-        .video-showcase-box {
-            background: #fff;
-            border: 2px solid var(--gold-light);
-            border-radius: var(--radius-lg);
-            padding: 14px;
-            box-shadow: 0 10px 26px rgba(0, 0, 0, 0.08);
-        }
-
-        .video-header-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-bottom: 10px;
-        }
-
-        .video-title-tag {
-            font-weight: 700;
-            color: var(--burgundy);
-            font-size: 0.95rem;
-        }
-
-        .video-player {
-            width: 100%;
-            max-height: 380px;
-            border-radius: var(--radius-md);
-            background: #1a1314;
-            display: block;
-        }
-
-        .media-upload-toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-            margin-top: 12px;
-        }
-
-        /* Hộp thông báo cấu hình Gmail */
-        .gmail-config-bar {
-            background: #fff;
-            border: 1px dashed var(--gold);
-            border-radius: 10px;
-            padding: 12px 14px;
-            margin-bottom: 16px;
-            display: flex;
-            flex-wrap: wrap;
-            align-items: center;
-            justify-content: space-between;
-            gap: 10px;
-            font-size: 0.88rem;
-        }
-
-        .gmail-config-bar label {
-            font-weight: 700;
-            color: var(--burgundy-dark);
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        .gmail-input {
-            flex: 1;
-            min-width: 220px;
-            padding: 8px 12px;
-            border: 1px solid #d9c8ae;
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 0.9rem;
-        }
-
-        .gmail-direct-actions {
-            margin-top: 10px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .gmail-open-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 16px;
-            border-radius: 99px;
-            background: #ea4335;
-            color: #fff;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-decoration: none;
-            box-shadow: 0 4px 12px rgba(234, 67, 53, 0.25);
-        }
-
-        .gmail-open-link:hover {
-            background: #c5221f;
-        }
-
-        .footer-welcome {
-            text-align: center;
-            margin-top: 32px;
-            padding-top: 20px;
-            border-top: 1px solid var(--gold-light);
-        }
-
-        .footer-welcome h3 {
-            font-family: 'Cormorant Garamond', Georgia, serif;
-            font-size: 1.55rem;
-            color: var(--burgundy);
-            margin-bottom: 4px;
-        }
-
-        .footer-sign {
-            font-family: 'Great Vibes', cursive;
-            font-size: 2.2rem;
-            color: var(--gold);
-        }
-
-        @media (max-width: 600px) {
-            .invitation-border {
-                padding: 22px 14px 30px;
-            }
-            .hero-banner img {
-                height: 300px;
-            }
-            .couple-script {
-                font-size: 2.3rem;
-            }
-            .couple-cards,
-            .contact-grid,
-            .rsvp-form-inputs,
-            .rsvp-action-buttons {
-                grid-template-columns: 1fr;
-            }
-            .photo-gallery-grid {
-                grid-template-columns: 1fr;
-            }
-            .venue-list li strong {
-                min-width: 100%;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MyFsend P2P - Chia Sẻ File Trực Tiếp Trên GitHub Pages</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <!-- Hiệu ứng cánh hoa rơi -->
-    <div class="petal-container" id="petalContainer" aria-hidden="true"></div>
+  <!-- HEADER -->
+  <header>
+    <a href="#" class="logo-container" id="logoReload">
+      <div class="logo-icon">⚡</div>
+      <div class="logo-text">
+        <h1>MyFsend P2P</h1>
+        <p>GitHub Pages Edition</p>
+      </div>
+    </a>
+    <div class="nav-actions">
+      <a href="#" class="btn-nav" id="btnNewShare">
+        <span>+</span>
+        <span>Gửi tệp tin mới</span>
+      </a>
+    </div>
+  </header>
 
-    <main class="wedding-invitation" role="main" aria-label="Thiệp mời đám cưới Nguyễn Hoàng Hải và Trần Minh Anh">
-        <div class="invitation-border">
-            <div class="corner tl"></div>
-            <div class="corner tr"></div>
-            <div class="corner bl"></div>
-            <div class="corner br"></div>
+  <!-- MAIN VIEW -->
+  <main>
+    <div class="hero-badge">
+      <span class="dot"></span>
+      <span>WebRTC P2P • Chạy 100% Web Tĩnh • Không Qua Máy Chủ Trung Gian</span>
+    </div>
 
-            <div class="top-label">Thiệp Mời Đám Cưới</div>
-            <h1 class="invite-headline">
-                “Trân trọng kính mời Quý khách đến dự bữa cơm thân mật chung vui cùng gia đình chúng tôi”
-            </h1>
+    <!-- KHỐI GIAO DIỆN CHÍNH -->
+    <div class="share-card">
 
-            <!-- Ảnh bìa thiệp cưới -->
-            <div class="hero-banner">
-                <img id="heroMainImg"
-                     src="anh-cuoi.jpg"
-                     alt="Ảnh cưới Chú rể Nguyễn Hoàng Hải và Cô dâu Trần Minh Anh">
-                <div class="hero-caption">
-                    <div class="couple-script">Nguyễn Hoàng Hải &amp; Trần Minh Anh</div>
-                    <div class="wedding-date-pill">Chủ Nhật • 22 . 11 . 2026</div>
-                </div>
+      <!-- ============================================== -->
+      <!-- 1. GIAO DIỆN DÀNH CHO NGƯỜI GỬI (SENDER VIEW) -->
+      <!-- ============================================== -->
+      <div id="senderSection">
+        
+        <!-- Bước 1: Chọn file & cài đặt -->
+        <div id="senderStepSelect">
+          <div class="dropzone" id="dropzone">
+            <div class="dropzone-icon">
+              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+            </div>
+            <div class="dropzone-title">Kéo & Thả tập tin vào đây</div>
+            <div class="dropzone-subtitle">Mọi dung lượng (Video, Game, ZIP, Tài liệu,...)</div>
+            <button type="button" class="btn-select-file" id="btnBrowseFile">
+              <span>+</span> Chọn Tập Tin
+            </button>
+            <input type="file" id="fileInput" class="hidden">
+          </div>
+
+          <!-- Preview file -->
+          <div class="file-preview hidden" id="filePreview">
+            <div class="file-info">
+              <div class="file-ext-badge" id="previewExtBadge">BIN</div>
+              <div>
+                <div class="file-name" id="previewFileName">ten_file.zip</div>
+                <div class="file-meta" id="previewFileSize">0 MB</div>
+              </div>
+            </div>
+            <button type="button" class="btn-remove-file" id="btnRemoveFile" title="Hủy chọn">✕</button>
+          </div>
+
+          <!-- Tùy chọn -->
+          <div class="options-form">
+            <div class="form-group">
+              <label for="inputPassword">Mật khẩu tải file (Tùy chọn):</label>
+              <input type="text" id="inputPassword" class="input-control" placeholder="Để trống nếu không muốn đặt mật khẩu">
             </div>
 
-            <!-- 🕊️ LỜI NGỎ -->
-            <section class="section-block" aria-labelledby="title-loi-ngo">
-                <h2 class="section-header" id="title-loi-ngo">🕊️ Lời Ngỏ</h2>
-                <div class="intro-card">
-                    “Tình yêu sau nhiều năm gắn bó đã đến ngày đơm hoa kết trái. Sự hiện diện và lời chúc phúc của bạn là niềm hạnh phúc trọn vẹn nhất đối với vợ chồng chúng tôi trong ngày trọng đại này!”
-                </div>
-            </section>
+            <div class="form-group">
+              <label for="inputNote">Lời nhắn cho người nhận (Tùy chọn):</label>
+              <input type="text" id="inputNote" class="input-control" placeholder="Ví dụ: Gửi bạn tài liệu dự án...">
+            </div>
 
-            <!-- 💒 THỜI GIAN & ĐỊA ĐIỂM -->
-            <section class="section-block" aria-labelledby="title-thoi-gian">
-                <h2 class="section-header" id="title-thoi-gian">💒 Thời Gian &amp; Địa Điểm</h2>
-
-                <div class="couple-cards">
-                    <div>
-                        <span class="person-role">Chú Rể</span>
-                        <div class="person-fullname">Nguyễn Hoàng Hải</div>
-                    </div>
-                    <div class="heart-divider" aria-hidden="true">&amp;</div>
-                    <div>
-                        <span class="person-role">Cô Dâu</span>
-                        <div class="person-fullname">Trần Minh Anh</div>
-                    </div>
-                </div>
-
-                <!-- Đồng hồ đếm ngược tới 11:30 22/11/2026 -->
-                <div class="countdown-row" aria-label="Đếm ngược tới giờ khai tiệc">
-                    <div class="cd-box">
-                        <span class="cd-num" id="cdDays">00</span>
-                        <span class="cd-txt">Ngày</span>
-                    </div>
-                    <div class="cd-box">
-                        <span class="cd-num" id="cdHours">00</span>
-                        <span class="cd-txt">Giờ</span>
-                    </div>
-                    <div class="cd-box">
-                        <span class="cd-num" id="cdMins">00</span>
-                        <span class="cd-txt">Phút</span>
-                    </div>
-                    <div class="cd-box">
-                        <span class="cd-num" id="cdSecs">00</span>
-                        <span class="cd-txt">Giây</span>
-                    </div>
-                </div>
-
-                <div class="venue-card">
-                    <ul class="venue-list">
-                        <li>
-                            <strong>Thời gian tiệc cưới:</strong>
-                            <span>11:30 - Chủ Nhật, Ngày 22/11/2026 <em>(nhằm ngày 14/10 Âm lịch)</em></span>
-                        </li>
-                        <li>
-                            <strong>Địa điểm:</strong>
-                            <span>Trung tâm Sảnh tiệc Cưới Mường Thanh</span>
-                        </li>
-                        <li>
-                            <strong>Địa chỉ:</strong>
-                            <span>Số 01 Đại lộ Lê Lợi, Phường Điện Biên, TP. Thanh Hóa</span>
-                        </li>
-                    </ul>
-                    <a class="map-link-btn"
-                       href="https://maps.google.com/?q=Khach+san+Muong+Thanh+So+01+Dai+lo+Le+Loi+Phuong+Dien+Bien+TP+Thanh+Hoa"
-                       target="_blank"
-                       rel="noopener noreferrer">
-                        🗺️ Mở Bản Đồ Chỉ Đường (Google Maps)
-                    </a>
-                </div>
-            </section>
-
-            <!-- 🎁 MỪNG HẠNH PHÚC / GỬI QUÀ TỪ XA -->
-            <section class="section-block" aria-labelledby="title-mung-cuoi">
-                <h2 class="section-header" id="title-mung-cuoi">🎁 Mừng Hạnh Phúc / Gửi Quà Từ Xa</h2>
-                <div class="gift-card">
-                    <p class="gift-lead">
-                        Với những người thân yêu ở xa hoặc không thể sắp xếp tham dự trực tiếp, mọi tình cảm và quà mừng dành cho hai vợ chồng xin được nhận qua thông tin bên dưới:
-                    </p>
-
-                    <div class="bank-details-box">
-                        <div class="bank-row">
-                            <span><strong>Ngân hàng:</strong> MB Bank (Ngân hàng Quân Đội)</span>
-                        </div>
-                        <div class="bank-row">
-                            <span><strong>Số tài khoản:</strong> <code id="accNum" style="font-size:1.05rem;font-weight:700;color:var(--burgundy);">0901234567</code></span>
-                            <button type="button" class="copy-inline-btn" onclick="copyText('0901234567', this)">📋 Sao chép STK</button>
-                        </div>
-                        <div class="bank-row">
-                            <span><strong>Chủ tài khoản:</strong> NGUYEN HOANG HAI (Chú Rể) / TRAN MINH ANH (Cô Dâu)</span>
-                        </div>
-                        <div class="bank-row">
-                            <span><strong>Nội dung chuyển khoản:</strong> [Tên bạn] + Mừng hạnh phúc Hoàng Hải &amp; Minh Anh</span>
-                        </div>
-                    </div>
-
-                    <div class="qr-wrapper">
-                        <p class="qr-note">(Quét mã QR Code bên dưới để gửi quà mừng trực tiếp)</p>
-                        <div class="qr-frame">
-                            <img id="qrCodeImg"
-                                 src="https://img.vietqr.io/image/MB-0901234567-compact2.png?addInfo=Mung%20dam%20cuoi%20Hoang%20Hai%20va%20Minh%20Anh&accountName=NGUYEN%20HOANG%20HAI"
-                                 alt="Mã QR Ngân hàng MB Bank - 0901234567">
-                            <span class="qr-placeholder-tag">[Mã QR Ngân hàng / VietQR]</span>
-                            <label class="upload-qr-label">
-                                📷 Đổi ảnh QR của bạn
-                                <input type="file" accept="image/*" onchange="previewCustomImage(event, 'qrCodeImg')">
-                            </label>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 📞 XÁC NHẬN SỰ THAM DỰ -->
-            <section class="section-block" aria-labelledby="title-rsvp">
-                <h2 class="section-header" id="title-rsvp">📞 Xác Nhận Sự Tham Dự</h2>
-                <div class="rsvp-card">
-                    <p class="rsvp-intro">
-                        Rất mong sự có mặt của bạn! Xin vui lòng phản hồi trước ngày <strong>15/11/2026</strong> để gia đình chuẩn bị cỗ bàn đón tiếp chu đáo nhất:
-                    </p>
-
-                    <div class="contact-grid">
-                        <div class="contact-pill">
-                            <span>Số điện thoại / Zalo Chú Rể</span>
-                            <a href="tel:0912345678">📞 0912 345 678</a>
-                        </div>
-                        <div class="contact-pill">
-                            <span>Số điện thoại / Zalo Cô Dâu</span>
-                            <a href="tel:0987654321">📞 0987 654 321</a>
-                        </div>
-                    </div>
-
-                    <!-- Form nhập tên & lời nhắn trước khi bấm nút Xác nhận hoặc Từ chối -->
-                    <div class="rsvp-form-inputs">
-                        <input type="text" id="rsvpGuestName" class="input-field" placeholder="Nhập tên của bạn (VD: Anh Nam, Bạn Lan...)">
-                        <input type="tel" id="rsvpGuestPhone" class="input-field" placeholder="Số điện thoại của bạn (Không bắt buộc)">
-                    </div>
-                    <textarea id="rsvpGuestMessage" rows="2" class="rsvp-textarea" placeholder="Lời chúc hoặc nhắn gửi tới Cô Dâu & Chú Rể..."></textarea>
-
-                    <!-- HAI NÚT XÁC NHẬN THAM DỰ & TỪ CHỐI -->
-                    <div class="rsvp-action-buttons">
-                        <button type="button" class="btn-accept" onclick="submitRSVP('accept')">
-                            ✅ Xác Nhận Tham Dự
-                        </button>
-                        <button type="button" class="btn-decline" onclick="submitRSVP('decline')">
-                            💌 Báo Bận / Từ Chối
-                        </button>
-                    </div>
-
-                    <!-- Thông báo trạng thái gửi về Gmail -->
-                    <div id="rsvpStatusBanner" class="rsvp-status-banner" role="status" aria-live="polite"></div>
-
-                    <!-- Form ẩn kết nối trực tiếp tới hệ thống gửi Gmail hoàn toàn bằng Tiếng Việt -->
-                    <iframe name="hiddenEmailFrame" id="hiddenEmailFrame" style="display:none;"></iframe>
-                    <form id="realEmailForm"
-                          action="https://formsubmit.co/ttyyia159@gmail.com"
-                          method="POST"
-                          target="hiddenEmailFrame"
-                          style="display:none;">
-                        <input type="hidden" name="_subject" id="emailSubjectField">
-                        <input type="hidden" name="_captcha" value="false">
-                        <input type="hidden" name="_template" value="table">
-                        <input type="hidden" name="Họ và tên khách mời" id="emailNameField">
-                        <input type="hidden" name="Số điện thoại liên hệ" id="emailPhoneField">
-                        <input type="hidden" name="Trạng thái phản hồi" id="emailStatusField">
-                        <input type="hidden" name="Lời chúc gửi Cô Dâu & Chú Rể" id="emailMsgField">
-                        <input type="hidden" name="Thời gian phản hồi" id="emailTimeField">
-                    </form>
-
-                    <!-- 📸🎬 KHU VỰC ẢNH VÀ VIDEO NGAY BÊN DƯỚI NÚT XÁC NHẬN & TỪ CHỐI -->
-                    <div class="media-showcase-under-rsvp">
-                        <h3 class="media-sub-title">📸 Khoảnh Khắc Hạnh Phúc &amp; Video Cưới</h3>
-                        <p class="media-sub-desc">
-                            Cùng ngắm nhìn những hình ảnh và thước phim kỷ niệm ngọt ngào của Nguyễn Hoàng Hải &amp; Trần Minh Anh
-                        </p>
-
-                        <!-- Bộ 3 ảnh cưới -->
-                        <div class="photo-gallery-grid">
-                            <div class="gallery-card">
-                                <img id="galleryImg1"
-                                     src="anh-cuoi-1.jpg"
-                                     alt="Ảnh cưới Nguyễn Hoàng Hải và Trần Minh Anh - Ngày chung đôi">
-                                <div class="gallery-caption">Ngày chung đôi</div>
-                            </div>
-                            <div class="gallery-card">
-                                <img id="galleryImg2"
-                                     src="anh-cuoi-2.jpg"
-                                     alt="Ảnh cưới Nguyễn Hoàng Hải và Trần Minh Anh - Nắm tay đi khắp thế gian">
-                                <div class="gallery-caption">Nắm tay đi khắp thế gian</div>
-                            </div>
-                            <div class="gallery-card">
-                                <img id="galleryImg3"
-                                     src="anh-cuoi-3.jpg"
-                                     alt="Ảnh cưới Nguyễn Hoàng Hải và Trần Minh Anh - Trăm năm hạnh phúc">
-                                <div class="gallery-caption">Trăm năm hạnh phúc</div>
-                            </div>
-                        </div>
-
-                        <!-- Khung Video kỷ niệm ngay bên dưới ảnh -->
-                        <div class="video-showcase-box">
-                            <div class="video-header-bar">
-                                <span class="video-title-tag">🎬 Video Kỷ Niệm Ngày Cưới: Nguyễn Hoàng Hải &amp; Trần Minh Anh</span>
-                                <label class="upload-qr-label">
-                                    🎞️ Chọn Video từ máy của bạn
-                                    <input type="file" accept="video/*" onchange="previewCustomVideo(event)">
-                                </label>
-                            </div>
-                            <video id="weddingVideoPlayer"
-                                   class="video-player"
-                                   controls
-                                   preload="metadata"
-                                   poster="anh-cuoi-1.jpg">
-                                <source id="weddingVideoSource"
-                                        src="video-cuoi.mp4"
-                                        type="video/mp4">
-                                Trình duyệt của bạn không hỗ trợ phát video.
-                            </video>
-
-                            <div class="media-upload-toolbar">
-                                <label class="upload-qr-label">
-                                    🖼️ Đổi Ảnh Cưới 1
-                                    <input type="file" accept="image/*" onchange="previewCustomImage(event, 'galleryImg1')">
-                                </label>
-                                <label class="upload-qr-label">
-                                    🖼️ Đổi Ảnh Cưới 2
-                                    <input type="file" accept="image/*" onchange="previewCustomImage(event, 'galleryImg2')">
-                                </label>
-                                <label class="upload-qr-label">
-                                    🖼️ Đổi Ảnh Cưới 3
-                                    <input type="file" accept="image/*" onchange="previewCustomImage(event, 'galleryImg3')">
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <footer class="footer-welcome">
-                <h3>Rất hân hạnh được đón tiếp!</h3>
-                <div class="footer-sign">Nguyễn Hoàng Hải &amp; Trần Minh Anh</div>
-            </footer>
+            <button type="button" class="btn-submit-upload" id="btnStartShare" disabled>
+              <span>TẠO LINK CHIA SẺ TRỰC TIẾP</span>
+              <span>🚀</span>
+            </button>
+          </div>
         </div>
-    </main>
 
-    <script>
-        // 1. Đồng hồ đếm ngược tới 11:30 ngày 22/11/2026
-        const targetWeddingTime = new Date('2026-11-22T11:30:00+07:00').getTime();
+        <!-- Bước 2: Hiển thị Link & Đang chia sẻ trực tiếp -->
+        <div id="senderStepActive" class="hidden" style="text-align: center;">
+          
+          <div class="status-pill" id="senderStatusPill">
+            <span class="pulse-dot"></span>
+            <span id="senderStatusText">Đang chờ người nhận mở link...</span>
+          </div>
 
-        function updateWeddingCountdown() {
-            const now = new Date().getTime();
-            const diff = targetWeddingTime - now;
+          <div class="link-box">
+            <input type="text" id="shareUrlInput" class="link-input" readonly>
+            <button type="button" class="btn-copy" id="btnCopyShareUrl">
+              <span>📋</span>
+              <span id="copyBtnText">Sao Chép</span>
+            </button>
+          </div>
 
-            if (diff <= 0) {
-                document.getElementById('cdDays').textContent = '00';
-                document.getElementById('cdHours').textContent = '00';
-                document.getElementById('cdMins').textContent = '00';
-                document.getElementById('cdSecs').textContent = '00';
-                return;
-            }
+          <!-- Mã QR để quét điện thoại -->
+          <div class="qr-section">
+            <div class="qr-title">📱 Quét mã QR để mở trang tải trên điện thoại:</div>
+            <div class="qr-canvas-container" id="qrContainer"></div>
+          </div>
 
-            const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const mins = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
-            const secs = Math.floor((diff % (1000 * 60)) / 1000);
+          <div class="tab-notice">
+            💡 <strong>Lưu ý quan trọng:</strong> Vì file được truyền trực tiếp từ máy của bạn sang người nhận qua P2P, xin vui lòng <strong>giữ tab này mở</strong> cho đến khi người nhận tải xong!
+          </div>
 
-            document.getElementById('cdDays').textContent = String(days).padStart(2, '0');
-            document.getElementById('cdHours').textContent = String(hours).padStart(2, '0');
-            document.getElementById('cdMins').textContent = String(mins).padStart(2, '0');
-            document.getElementById('cdSecs').textContent = String(secs).padStart(2, '0');
-        }
+          <!-- Tiến trình truyền dữ liệu khi người nhận bắt đầu tải -->
+          <div class="progress-card hidden" id="senderProgressCard">
+            <div class="progress-header">
+              <span style="font-size: 13px; font-weight: 600;" id="senderProgressTitle">Đang gửi dữ liệu...</span>
+              <span class="progress-percent" id="senderProgressPercent">0%</span>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar-fill" id="senderProgressBar"></div>
+            </div>
+            <div class="progress-stats">
+              <span id="senderProgressStats">0 MB / 0 MB</span>
+              <span id="senderSpeedStats">0 MB/s</span>
+            </div>
+          </div>
 
-        updateWeddingCountdown();
-        setInterval(updateWeddingCountdown, 1000);
+        </div>
 
-        // 2. Sao chép số tài khoản
-        function copyText(text, btn) {
-            if (navigator.clipboard) {
-                navigator.clipboard.writeText(text);
-            }
-            const oldLabel = btn.textContent;
-            btn.textContent = '✅ Đã sao chép!';
-            setTimeout(() => {
-                btn.textContent = oldLabel;
-            }, 1800);
-        }
+      </div>
 
-        // 3. Xử lý nút Xác nhận tham dự & Từ chối -> Gửi thông báo hoàn toàn bằng Tiếng Việt về Gmail: ttyyia159@gmail.com
-        const HOST_GMAIL = 'ttyyia159@gmail.com';
+      <!-- ================================================ -->
+      <!-- 2. GIAO DIỆN DÀNH CHO NGƯỜI NHẬN (RECEIVER VIEW) -->
+      <!-- ================================================ -->
+      <div id="receiverSection" class="hidden">
+        
+        <!-- Đang kết nối tới người gửi -->
+        <div id="receiverConnecting" style="text-align: center; padding: 40px 10px;">
+          <div style="font-size: 32px; animation: pulse 1.5s infinite;">⚡</div>
+          <p style="margin-top: 14px; font-weight: 600; color: #fff;">Đang kết nối trực tiếp tới người gửi...</p>
+          <p style="font-size: 12.5px; color: var(--text-muted); margin-top: 6px;">Vui lòng chờ trong giây lát.</p>
+        </div>
 
-        async function submitRSVP(type) {
-            const nameInput = document.getElementById('rsvpGuestName');
-            const phoneInput = document.getElementById('rsvpGuestPhone');
-            const msgInput = document.getElementById('rsvpGuestMessage');
-            const statusBanner = document.getElementById('rsvpStatusBanner');
+        <!-- Đã kết nối thành công & sẵn sàng tải -->
+        <div id="receiverReady" class="hidden receiver-card">
+          <div class="rc-icon" id="rcFileIcon">📦</div>
+          <h2 class="rc-title" id="rcFileName">Tệp tin</h2>
+          <div class="rc-meta" id="rcFileSize">0 MB</div>
 
-            const targetEmail = HOST_GMAIL;
-            const guestName = nameInput.value.trim() || 'Quý khách';
-            const guestPhone = phoneInput.value.trim() || 'Không cung cấp';
-            const statusText = type === 'accept' ? 'XÁC NHẬN THAM DỰ' : 'BÁO BẬN / TỪ CHỐI THAM DỰ';
-            const defaultMsg = type === 'accept'
-                ? 'Mình chắc chắn sẽ đến chung vui cùng hai vợ chồng!'
-                : 'Rất tiếc mình bận việc không thể đến dự trực tiếp, chúc hai bạn trăm năm hạnh phúc!';
-            const guestMsg = msgInput.value.trim() || defaultMsg;
-            const timeNow = new Date().toLocaleString('vi-VN');
+          <div class="rc-note hidden" id="rcNoteBox">
+            <span id="rcNoteText">"Lời nhắn"</span>
+          </div>
 
-            const subject = `[Thiệp Cưới Nguyễn Hoàng Hải & Trần Minh Anh] Thông báo từ ${guestName}: ${statusText}`;
-            const bodyLines = [
-                `Xin chào Chú rể Nguyễn Hoàng Hải & Cô dâu Trần Minh Anh,`,
-                ``,
-                `Bạn vừa nhận được một thông báo phản hồi thiệp cưới mới:`,
-                `- Họ và tên khách mời: ${guestName}`,
-                `- Số điện thoại liên hệ: ${guestPhone}`,
-                `- Trạng thái phản hồi: ${statusText}`,
-                `- Lời chúc gửi Cô Dâu & Chú Rể: ${guestMsg}`,
-                `- Thời gian gửi: ${timeNow}`,
-                `- Tiệc cưới: 11:30 - Chủ Nhật, Ngày 22/11/2026 tại Trung tâm Sảnh tiệc Cưới Mường Thanh, TP. Thanh Hóa`
-            ];
-            const body = bodyLines.join('\n');
-            const gmailComposeUrl = `https://mail.google.com/mail/?view=cm&fs=1&to=${encodeURIComponent(targetEmail)}&su=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+          <!-- Mật khẩu nếu có -->
+          <div id="rcPasswordBox" class="hidden" style="margin-bottom: 18px; text-align: left;">
+            <label style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 6px; display: block;">
+              🔒 Nhập mật khẩu để mở khóa tệp tin:
+            </label>
+            <input type="password" id="rcInputPassword" class="input-control" placeholder="Nhập mật khẩu...">
+            <div id="rcPassError" style="color: var(--danger); font-size: 12px; margin-top: 6px; display: none;">
+              Mật khẩu không chính xác!
+            </div>
+          </div>
 
-            statusBanner.className = 'rsvp-status-banner ' + (type === 'accept' ? 'accepted' : 'declined');
-            statusBanner.innerHTML = `⏳ Đang gửi thông báo <strong>${statusText}</strong> của <strong>${guestName}</strong> về hộp thư <strong>${targetEmail}</strong>...`;
+          <button type="button" class="btn-download-big" id="btnReceiverDownload">
+            <span>TẢI XUỐNG TỆP TIN</span>
+            <span>📥</span>
+          </button>
 
-            // 1. Gửi trực tiếp qua máy chủ Gmail Tiếng Việt (sử dụng mật khẩu ứng dụng broi iwfz jjfx niuu của bạn)
-            try {
-                const res = await fetch('http://localhost:8080/send-rsvp', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        guestName: guestName,
-                        guestPhone: guestPhone,
-                        statusText: statusText,
-                        guestMsg: guestMsg,
-                        timeNow: timeNow
-                    })
-                });
-                const result = await res.json();
-                if (result.success) {
-                    statusBanner.innerHTML = `🎉 Đã gửi thông báo <strong>${statusText}</strong> của <strong>${guestName}</strong> bằng Tiếng Việt thẳng vào hộp thư <strong>${targetEmail}</strong> thành công!`;
-                    nameInput.value = '';
-                    phoneInput.value = '';
-                    msgInput.value = '';
-                    return;
-                }
-            } catch (err) {}
+          <!-- Tiến trình tải -->
+          <div class="progress-card hidden" id="receiverProgressCard">
+            <div class="progress-header">
+              <span style="font-size: 13px; font-weight: 600;" id="rcProgressTitle">Đang nhận dữ liệu...</span>
+              <span class="progress-percent" id="rcProgressPercent">0%</span>
+            </div>
+            <div class="progress-bar-container">
+              <div class="progress-bar-fill" id="rcProgressBar"></div>
+            </div>
+            <div class="progress-stats">
+              <span id="rcProgressStats">0 MB / 0 MB</span>
+              <span id="rcSpeedStats">0 MB/s</span>
+            </div>
+          </div>
 
-            // 2. Khi chạy trên GitHub Pages (https://ttyyia159-afk.github.io/), gửi các trường hoàn toàn bằng Tiếng Việt
-            try {
-                const formData = new FormData();
-                formData.append('_subject', subject);
-                formData.append('_captcha', 'false');
-                formData.append('_template', 'table');
-                formData.append('Họ và tên khách mời', guestName);
-                formData.append('Số điện thoại liên hệ', guestPhone);
-                formData.append('Trạng thái phản hồi', statusText);
-                formData.append('Lời chúc gửi Cô Dâu & Chú Rể', guestMsg);
-                formData.append('Thời gian phản hồi', timeNow);
+          <p style="font-size: 11.5px; color: var(--text-muted); margin-top: 16px;">
+            Mã hóa trực tiếp WebRTC P2P từ trình duyệt của người gửi. Không lưu trên bất kỳ máy chủ nào.
+          </p>
+        </div>
 
-                const res = await fetch(`https://formsubmit.co/ajax/${targetEmail}`, {
-                    method: 'POST',
-                    headers: {
-                        'Accept': 'application/json'
-                    },
-                    body: formData
-                });
-                const data = await res.json();
-                if (data.success === 'true' || data.success === true) {
-                    statusBanner.innerHTML = `🎉 Đã gửi thông báo <strong>${statusText}</strong> của <strong>${guestName}</strong> bằng Tiếng Việt về hộp thư <strong>${targetEmail}</strong> thành công!`;
-                    nameInput.value = '';
-                    phoneInput.value = '';
-                    msgInput.value = '';
-                    return;
-                }
-            } catch (err) {}
+        <!-- Lỗi không kết nối được -->
+        <div id="receiverError" class="hidden" style="text-align: center; padding: 30px 10px;">
+          <div style="font-size: 40px; margin-bottom: 14px;">⚠️</div>
+          <h3 style="color: #fff; margin-bottom: 8px;" id="rcErrorTitle">Không Thể Kết Nối</h3>
+          <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 20px;" id="rcErrorDesc">
+            Người gửi có thể đã đóng trình duyệt hoặc phòng chia sẻ đã hết hạn.
+          </p>
+          <a href="#" class="btn-nav" id="btnRcHome">Về Trang Chủ Gửi File</a>
+        </div>
 
-            // 3. Dự phòng gửi qua biểu mẫu Tiếng Việt ẩn + nút gửi trực tiếp bằng Gmail Tiếng Việt
-            document.getElementById('emailSubjectField').value = subject;
-            document.getElementById('emailNameField').value = guestName;
-            document.getElementById('emailPhoneField').value = guestPhone;
-            document.getElementById('emailStatusField').value = statusText;
-            document.getElementById('emailMsgField').value = guestMsg;
-            document.getElementById('emailTimeField').value = timeNow;
+      </div>
 
-            try {
-                document.getElementById('realEmailForm').submit();
-            } catch (err) {}
+    </div>
+  </main>
 
-            statusBanner.innerHTML = `
-                <div>✅ Đã ghi nhận phản hồi <strong>${statusText}</strong> của <strong>${guestName}</strong> và chuyển thông báo Tiếng Việt về hộp thư <strong>${targetEmail}</strong>!</div>
-                <div class="gmail-direct-actions">
-                    <a class="gmail-open-link" href="${gmailComposeUrl}" target="_blank" rel="noopener noreferrer">
-                        ✉️ Gửi trực tiếp bằng Gmail Tiếng Việt
-                    </a>
-                </div>
-            `;
+  <!-- FOOTER -->
+  <footer>
+    <p>MyFsend P2P Edition • Lưu trữ và chạy trực tiếp trên <strong>GitHub Pages</strong> • Bảo mật 100%.</p>
+  </footer>
 
-            nameInput.value = '';
-            phoneInput.value = '';
-            msgInput.value = '';
-        }
-
-        // 4. Đổi ảnh QR hoặc ảnh cưới trực tiếp từ máy
-        function previewCustomImage(event, targetImgId) {
-            const file = event.target.files && event.target.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById(targetImgId).src = e.target.result;
-            };
-            reader.readAsDataURL(file);
-        }
-
-        // 5. Đổi video cưới trực tiếp từ máy
-        function previewCustomVideo(event) {
-            const file = event.target.files && event.target.files[0];
-            if (!file) return;
-            const videoUrl = URL.createObjectURL(file);
-            const videoPlayer = document.getElementById('weddingVideoPlayer');
-            const videoSource = document.getElementById('weddingVideoSource');
-            videoSource.src = videoUrl;
-            videoPlayer.load();
-            videoPlayer.play();
-        }
-
-        // 6. Hiệu ứng cánh hoa rơi
-        (function initPetals() {
-            const container = document.getElementById('petalContainer');
-            for (let i = 0; i < 14; i++) {
-                const petal = document.createElement('div');
-                petal.className = 'petal';
-                const size = Math.random() * 10 + 8;
-                petal.style.width = size + 'px';
-                petal.style.height = size + 'px';
-                petal.style.left = Math.random() * 100 + 'vw';
-                petal.style.animationDuration = (Math.random() * 7 + 8) + 's';
-                petal.style.animationDelay = (Math.random() * 5) + 's';
-                container.appendChild(petal);
-            }
-        })();
-    </script>
+  <!-- LIBRARIES -->
+  <!-- Sử dụng file peerjs.min.js nội bộ, tự động dự phòng sang CDN unpkg nếu cần -->
+  <script src="peerjs.min.js"></script>
+  <script>
+    if (typeof Peer === "undefined") {
+      document.write('<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"><\/script>');
+    }
+  </script>
+  <script src="qrcode.min.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
