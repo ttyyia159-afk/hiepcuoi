@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tải Tệp Tin - MiSend</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fa-solid fa-cloud-arrow-up logo-icon"></i>
+                <span class="logo-text">Mi<span class="highlight">Send</span></span>
+            </div>
+            <p class="tagline">Tải tệp tin tốc độ cao 24/7</p>
+        </header>
+
+        <!-- Main Card -->
+        <main class="card">
+            <div class="download-section">
+                <div class="download-icon-box">
+                    <i class="fa-solid fa-file-arrow-down download-main-icon"></i>
+                </div>
+
+                <h2 class="ready-title">Tệp tin đã sẵn sàng để tải về</h2>
+
+                <!-- File Info Card -->
+                <div class="file-info-box download-file-box">
+                    <i class="fa-solid fa-file-lines file-info-icon" id="fileIcon"></i>
+                    <div class="file-info-text">
+                        <div class="file-name" id="downloadFileName">Đang tải thông tin...</div>
+                        <div class="file-meta" id="downloadFileSize">Vui lòng chờ giây lát...</div>
+                    </div>
+                </div>
+
+                <!-- Big Prominent Download Button -->
+                <a id="mainDownloadBtn" href="#" class="btn btn-download-primary">
+                    <i class="fa-solid fa-circle-arrow-down"></i> TẢI PHAI XUỐNG
+                </a>
+
+                <p class="download-tip">
+                    <i class="fa-solid fa-circle-info"></i> Tệp tin được tải trực tiếp từ máy chủ đám mây, an toàn và bảo mật 100%.
+                </p>
+
+                <div class="divider"></div>
+
+                <div class="home-link-wrap">
+                    <a href="index.html" class="btn btn-secondary">
+                        <i class="fa-solid fa-cloud-arrow-up"></i> Bạn muốn chia sẻ tệp mới? Bấm vào đây
+                    </a>
+                </div>
+            </div>
+        </main>
+
+        <!-- Features Banner -->
+        <footer class="footer-info">
+            <div class="feature-item">
+                <i class="fa-solid fa-bolt"></i>
+                <span>Tốc độ tải tối đa</span>
+            </div>
+            <div class="feature-item">
+                <i class="fa-solid fa-lock"></i>
+                <span>Liên kết tải an toàn</span>
+            </div>
+        </footer>
+    </div>
+
+    <script>
+        // Parse URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const fileUrl = urlParams.get('url');
+        const fileName = urlParams.get('name') || 'tep_tin_chia_se';
+        const fileSize = urlParams.get('size') || '';
+
+        const fileNameEl = document.getElementById('downloadFileName');
+        const fileSizeEl = document.getElementById('downloadFileSize');
+        const mainDownloadBtn = document.getElementById('mainDownloadBtn');
+        const fileIconEl = document.getElementById('fileIcon');
+
+        // Set extension icon
+        const ext = fileName.split('.').pop().toLowerCase();
+        if (['zip', 'rar', '7z', 'tar', 'gz'].includes(ext)) {
+            fileIconEl.className = 'fa-solid fa-file-zipper file-info-icon';
+        } else if (['mp4', 'mkv', 'avi', 'mov', 'wmv'].includes(ext)) {
+            fileIconEl.className = 'fa-solid fa-file-video file-info-icon';
+        } else if (['mp3', 'wav', 'ogg', 'flac', 'm4a'].includes(ext)) {
+            fileIconEl.className = 'fa-solid fa-file-audio file-info-icon';
+        } else if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'svg'].includes(ext)) {
+            fileIconEl.className = 'fa-solid fa-file-image file-info-icon';
+        } else if (['pdf'].includes(ext)) {
+            fileIconEl.className = 'fa-solid fa-file-pdf file-info-icon';
+        } else if (['doc', 'docx'].includes(ext)) {
+            fileIconEl.className = 'fa-solid fa-file-word file-info-icon';
+        } else if (['xls', 'xlsx'].includes(ext)) {
+            fileIconEl.className = 'fa-solid fa-file-excel file-info-icon';
+        }
+
+        if (fileUrl) {
+            const decodedName = decodeURIComponent(fileName);
+            const decodedUrl = decodeURIComponent(fileUrl);
+
+            fileNameEl.textContent = decodedName;
+            fileSizeEl.textContent = fileSize ? `Kích thước: ${decodeURIComponent(fileSize)}` : 'Sẵn sàng tải xuống';
+            
+            // Force download parameter for Supabase
+            const downloadUrl = decodedUrl.includes('?') 
+                ? `${decodedUrl}&download=${encodeURIComponent(decodedName)}`
+                : `${decodedUrl}?download=${encodeURIComponent(decodedName)}`;
+
+            mainDownloadBtn.href = downloadUrl;
+            mainDownloadBtn.setAttribute('download', decodedName);
+            mainDownloadBtn.setAttribute('target', '_blank');
+        } else {
+            fileNameEl.textContent = 'Liên kết không hợp lệ';
+            fileSizeEl.textContent = 'Vui lòng kiểm tra lại đường dẫn chia sẻ.';
+            mainDownloadBtn.style.opacity = '0.5';
+            mainDownloadBtn.style.pointerEvents = 'none';
+        }
+    </script>
+</body>
+</html>

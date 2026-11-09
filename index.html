@@ -1,208 +1,115 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MyFsend - Chia Sẻ Phai Trực Tiếp (Firebase Cloud)</title>
-  <link rel="stylesheet" href="style.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chia Sẻ Tệp Tin Nhanh - MiSend</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-
-  <!-- Cảnh báo cấu hình Firebase -->
-  <div id="configWarning" class="hidden" style="background: #eab308; color: #000; padding: 14px 20px; text-align: center; font-weight: 600; font-size: 13.5px; position: sticky; top: 0; z-index: 9999; box-shadow: 0 4px 12px rgba(0,0,0,0.3);">
-    ⚠️ <strong>LƯU Ý:</strong> Bạn chưa dán mã cấu hình Firebase vào file <code>app.js</code>! Hãy mở file <strong>app.js</strong> và thay thế <code>firebaseConfig</code> của bạn vào nhé (xem file <strong>HUONG_DAN_FIREBASE.md</strong>).
-  </div>
-
-  <!-- HEADER -->
-  <header>
-    <a href="#" class="logo-container" id="logoReload">
-      <div class="logo-icon">⚡</div>
-      <div class="logo-text">
-        <h1>MyFsend</h1>
-        <p>Google Firebase Cloud Edition</p>
-      </div>
-    </a>
-    <div class="nav-actions">
-      <a href="#" class="btn-nav" id="btnNewShare">
-        <span>+</span>
-        <span>Chia sẻ phai mới</span>
-      </a>
-    </div>
-  </header>
-
-  <!-- MAIN VIEW -->
-  <main>
-    <div class="hero-badge">
-      <span class="dot"></span>
-      <span>Lưu Trữ Google Cloud • Người Nhận Bấm Là Tải Ngay • Người Gửi Tắt Máy Thoải Mái</span>
-    </div>
-
-    <!-- KHỐI GIAO DIỆN CHÍNH -->
-    <div class="share-card">
-
-      <!-- ============================================== -->
-      <!-- 1. GIAO DIỆN DÀNH CHO NGƯỜI GỬI (SENDER VIEW) -->
-      <!-- ============================================== -->
-      <div id="senderSection">
-        
-        <!-- Bước 1: Chọn phai để tải lên -->
-        <div id="senderStepSelect">
-          <div class="dropzone" id="dropzone">
-            <div class="dropzone-icon">
-              <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                <polyline points="17 8 12 3 7 8"/>
-                <line x1="12" y1="3" x2="12" y2="15"/>
-              </svg>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fa-solid fa-cloud-arrow-up logo-icon"></i>
+                <span class="logo-text">Mi<span class="highlight">Send</span></span>
             </div>
-            <div class="dropzone-title">Kéo & Thả phai vào đây</div>
-            <div class="dropzone-subtitle">Lưu trữ trên Google Cloud (Hỗ trợ mọi định dạng: Video, ZIP, Game, Tài liệu,...)</div>
-            <button type="button" class="btn-select-file" id="btnBrowseFile">
-              <span>+</span> Chọn Phai Từ Máy Tính
-            </button>
-            <input type="file" id="fileInput" class="hidden">
-          </div>
+            <p class="tagline">Chia sẻ tệp tin trực tuyến tốc độ cao - Miễn phí 24/7</p>
+        </header>
 
-          <!-- Preview phai đã chọn -->
-          <div class="file-preview hidden" id="filePreview">
-            <div class="file-info">
-              <div class="file-ext-badge" id="previewExtBadge">BIN</div>
-              <div>
-                <div class="file-name" id="previewFileName">ten_phai.zip</div>
-                <div class="file-meta" id="previewFileSize">0 MB</div>
-              </div>
-            </div>
-            <button type="button" class="btn-remove-file" id="btnRemoveFile" title="Hủy chọn">✕</button>
-          </div>
-
-          <!-- Tùy chọn -->
-          <div class="options-form">
-            <div class="form-group">
-              <label for="inputNote">Lời nhắn cho người nhận (Tùy chọn):</label>
-              <input type="text" id="inputNote" class="input-control" placeholder="Ví dụ: Gửi bạn tài liệu dự án...">
+        <!-- Main Card -->
+        <main class="card">
+            <!-- Upload Area -->
+            <div id="dropZone" class="drop-zone">
+                <input type="file" id="fileInput" class="file-input">
+                <div class="drop-zone-content">
+                    <div class="upload-icon-wrapper">
+                        <i class="fa-solid fa-cloud-arrow-up upload-icon"></i>
+                    </div>
+                    <h3>Kéo thả tệp vào đây</h3>
+                    <p class="sub-text">hoặc</p>
+                    <button type="button" class="btn btn-select" id="selectBtn">
+                        <i class="fa-solid fa-folder-open"></i> CHỌN TỆP TỪ THIẾT BỊ
+                    </button>
+                    <p class="file-limits">Hỗ trợ mọi định dạng tệp (Tài liệu, Video, Ảnh, RAR, ZIP...)</p>
+                </div>
             </div>
 
-            <!-- Nút bắt đầu tải lên -->
-            <button type="button" class="btn-submit-upload" id="btnStartUpload" disabled>
-              <span>TẢI PHAI LÊN MÁY CHỦ GOOGLE</span>
-              <span>🚀</span>
-            </button>
-          </div>
-        </div>
+            <!-- Upload Progress Section -->
+            <div id="progressSection" class="section hidden">
+                <div class="file-preview">
+                    <i class="fa-solid fa-file-lines file-type-icon"></i>
+                    <div class="file-details">
+                        <div class="file-name" id="uploadFileName">tailieu.pdf</div>
+                        <div class="file-meta" id="uploadFileSize">0 MB</div>
+                    </div>
+                </div>
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar"></div>
+                </div>
+                <div class="progress-status">
+                    <span id="progressPercent">0%</span>
+                    <span id="uploadStatusText">Đang tải lên máy chủ...</span>
+                </div>
+            </div>
 
-        <!-- Bước 2: Đang tải phai lên Google Cloud -->
-        <div id="senderStepUploading" class="hidden" style="text-align: center; padding: 20px 0;">
-          <div style="font-size: 15px; font-weight: 600; margin-bottom: 12px; color: #fff;">
-            Đang tải phai lên máy chủ Google Cloud...
-          </div>
-          <div class="progress-bar-container">
-            <div class="progress-bar-fill" id="uploadProgressBar"></div>
-          </div>
-          <div class="progress-stats" style="margin-top: 10px;">
-            <span id="uploadProgressStats">0 MB / 0 MB</span>
-            <span id="uploadProgressPercent" style="font-weight: 700; color: var(--primary);">0%</span>
-          </div>
-          <p style="font-size: 12px; color: var(--text-muted); margin-top: 14px;">
-            Sau khi tải lên xong, bạn có thể tắt máy đi ngủ thoải mái, phai được lưu an toàn trên đám mây!
-          </p>
-        </div>
+            <!-- Success Section -->
+            <div id="successSection" class="section hidden">
+                <div class="success-badge">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <h3>Tải lên thành công!</h3>
+                    <p>Liên kết chia sẻ 24/7 đã sẵn sàng để gửi cho bạn bè.</p>
+                </div>
 
-        <!-- Bước 3: Tải lên thành công -> Nút Sao chép liên kết -->
-        <div id="senderStepSuccess" class="hidden" style="text-align: center;">
-          <div class="success-icon" style="width: 56px; height: 56px; background: rgba(16, 185, 129, 0.15); color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 12px;">✓</div>
-          <h2 style="font-size: 19px; color: #fff; margin-bottom: 6px;">Tải Phai Lên Thành Công!</h2>
-          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px;">
-            Phai đã được lưu trên máy chủ đám mây. Bạn hãy gửi liên kết này cho bạn bè:
-          </p>
+                <div class="file-info-box">
+                    <i class="fa-solid fa-file-zipper file-info-icon"></i>
+                    <div class="file-info-text">
+                        <div class="file-name" id="successFileName">tenfile.zip</div>
+                        <div class="file-meta" id="successFileSize">0 MB</div>
+                    </div>
+                </div>
 
-          <!-- Hiển thị tên phai vừa tải lên -->
-          <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 18px; text-align: left;">
-            <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px;">Phai đang chia sẻ:</div>
-            <div style="font-size: 15px; font-weight: 700; color: #60a5fa; margin-top: 3px; word-break: break-all;" id="successFileName">ten_phai.zip</div>
-            <div style="font-size: 12.5px; color: var(--text-muted); margin-top: 2px;" id="successFileSize">0 MB</div>
-          </div>
+                <div class="link-box">
+                    <input type="text" id="shareLinkInput" readonly>
+                    <button type="button" class="btn btn-copy" id="copyLinkBtn">
+                        <i class="fa-solid fa-copy"></i> SAO CHÉP LIÊN KẾT
+                    </button>
+                </div>
 
-          <!-- NÚT SAO CHÉP LIÊN KẾT TO NỔI BẬT (KHÔNG CẦN QUÉT QR) -->
-          <button type="button" class="btn-copy-big" id="btnCopyShareUrl">
-            <span>📋</span>
-            <span id="copyBtnText">SAO CHÉP LIÊN KẾT ĐỂ GỬI CHO BẠN BÈ</span>
-          </button>
+                <div class="action-buttons">
+                    <button type="button" class="btn btn-secondary" id="uploadAnotherBtn">
+                        <i class="fa-solid fa-plus"></i> Chia sẻ tệp khác
+                    </button>
+                </div>
+            </div>
+        </main>
 
-          <!-- Hộp liên kết -->
-          <div class="link-box" style="margin-top: 14px;">
-            <input type="text" id="shareUrlInput" class="link-input" readonly>
-          </div>
-
-          <div style="background: rgba(16, 185, 129, 0.08); border: 1px solid rgba(16, 185, 129, 0.25); color: #34d399; font-size: 12.5px; padding: 10px 14px; border-radius: var(--radius-sm); margin-top: 16px; line-height: 1.5;">
-            🎉 <strong>Tuyệt vời:</strong> Bạn có thể <strong>tắt máy tính hoặc đóng tab này thoải mái</strong>! Bạn bè bấm vào link trên Zalo, Messenger, điện thoại hay máy tính đều tải được ngay lập tức 100%.
-          </div>
-
-          <button type="button" class="btn-nav" id="btnUploadAnother" style="margin-top: 16px; width: 100%; justify-content: center; padding: 10px;">
-            + Chia sẻ phai khác
-          </button>
-        </div>
-
-      </div>
-
-      <!-- ================================================ -->
-      <!-- 2. GIAO DIỆN DÀNH CHO NGƯỜI NHẬN (RECEIVER VIEW) -->
-      <!-- ================================================ -->
-      <div id="receiverSection" class="hidden">
-        
-        <!-- Đang tải thông tin phai từ máy chủ -->
-        <div id="receiverLoading" style="text-align: center; padding: 40px 10px;">
-          <div style="font-size: 32px; animation: pulse 1.5s infinite;">⏳</div>
-          <p style="margin-top: 14px; font-weight: 600; color: #fff;">Đang lấy thông tin tệp tin từ máy chủ...</p>
-        </div>
-
-        <!-- Đã tải xong thông tin -> Hiển thị Tên Phai và Nút Tải Xuống -->
-        <div id="receiverReady" class="hidden receiver-card">
-          <div class="rc-icon" id="rcFileIcon">📦</div>
-          
-          <div style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; letter-spacing: 0.5px;">
-            Bạn nhận được tệp tin chia sẻ:
-          </div>
-          <!-- HIỂN THỊ TÊN PHAI RÕ RÀNG -->
-          <h2 class="rc-title" id="rcFileName">Tên Phai</h2>
-          <div class="rc-meta" id="rcFileSize">Dung lượng: 0 MB</div>
-
-          <!-- Lời nhắn nếu có -->
-          <div class="rc-note hidden" id="rcNoteBox">
-            <span id="rcNoteText">"Lời nhắn"</span>
-          </div>
-
-          <!-- NÚT TẢI PHAI XUỐNG MÁY -->
-          <a href="#" target="_blank" class="btn-download-big" id="btnDownloadFile" style="text-decoration: none;">
-            <span>TẢI PHAI XUỐNG NGAY</span>
-            <span>📥</span>
-          </a>
-
-          <p style="font-size: 11.5px; color: var(--text-muted); margin-top: 16px;">
-            Tải trực tiếp tốc độ tối đa từ máy chủ Google Cloud. An toàn & bảo mật 100%.
-          </p>
-        </div>
-
-        <!-- Lỗi không tìm thấy phai -->
-        <div id="receiverError" class="hidden" style="text-align: center; padding: 30px 10px;">
-          <div style="font-size: 40px; margin-bottom: 14px;">⚠️</div>
-          <h3 style="color: #fff; margin-bottom: 8px;">Không Tìm Thấy Tệp Tin</h3>
-          <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 20px;">
-            Liên kết này không tồn tại hoặc tệp tin đã bị xóa khỏi máy chủ.
-          </p>
-          <a href="#" class="btn-nav" id="btnRcHome">Về Trang Chủ Tải Phai</a>
-        </div>
-
-      </div>
-
+        <!-- Features Banner -->
+        <footer class="footer-info">
+            <div class="feature-item">
+                <i class="fa-solid fa-bolt"></i>
+                <span>Tốc độ tải cực nhanh</span>
+            </div>
+            <div class="feature-item">
+                <i class="fa-solid fa-cloud"></i>
+                <span>Lưu trữ đám mây 24/7</span>
+            </div>
+            <div class="feature-item">
+                <i class="fa-solid fa-shield-halved"></i>
+                <span>Bảo mật & Trực tiếp</span>
+            </div>
+        </footer>
     </div>
-  </main>
 
-  <!-- FOOTER -->
-  <footer>
-    <p>MyFsend Edition • Hoạt động trên nền tảng <strong>Firebase & Google Cloud</strong> • Tốc độ cao & ổn định 100%.</p>
-  </footer>
+    <!-- Notification Toast -->
+    <div id="toast" class="toast hidden">
+        <i class="fa-solid fa-check"></i>
+        <span id="toastMsg">Đã sao chép liên kết!</span>
+    </div>
 
-  <!-- SCRIPT LOGIC (Firebase Modular v10) -->
-  <script type="module" src="app.js"></script>
+    <script src="app.js"></script>
 </body>
 </html>
