@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MyFsend P2P - Chia Sẻ File Trực Tiếp Trên GitHub Pages</title>
+  <title>MyFsend - Chia Sẻ Phai Trực Tiếp (GitHub Pages)</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -13,14 +13,14 @@
     <a href="#" class="logo-container" id="logoReload">
       <div class="logo-icon">⚡</div>
       <div class="logo-text">
-        <h1>MyFsend P2P</h1>
-        <p>GitHub Pages Edition</p>
+        <h1>MyFsend</h1>
+        <p>Chia Sẻ Phai Trực Tiếp</p>
       </div>
     </a>
     <div class="nav-actions">
       <a href="#" class="btn-nav" id="btnNewShare">
         <span>+</span>
-        <span>Gửi tệp tin mới</span>
+        <span>Chia sẻ phai mới</span>
       </a>
     </div>
   </header>
@@ -29,7 +29,7 @@
   <main>
     <div class="hero-badge">
       <span class="dot"></span>
-      <span>WebRTC P2P • Chạy 100% Web Tĩnh • Không Qua Máy Chủ Trung Gian</span>
+      <span>Chia Sẻ Trực Tiếp • Không Giới Hạn Dung Lượng • Không Cần Quét QR</span>
     </div>
 
     <!-- KHỐI GIAO DIỆN CHÍNH -->
@@ -40,7 +40,7 @@
       <!-- ============================================== -->
       <div id="senderSection">
         
-        <!-- Bước 1: Chọn file & cài đặt -->
+        <!-- YÊU CẦU 1: KHI VÀO TRANG CÓ NÚT CHỌN/TẢI PHAI LÊN -->
         <div id="senderStepSelect">
           <div class="dropzone" id="dropzone">
             <div class="dropzone-icon">
@@ -50,30 +50,30 @@
                 <line x1="12" y1="3" x2="12" y2="15"/>
               </svg>
             </div>
-            <div class="dropzone-title">Kéo & Thả tập tin vào đây</div>
-            <div class="dropzone-subtitle">Mọi dung lượng (Video, Game, ZIP, Tài liệu,...)</div>
+            <div class="dropzone-title">Kéo & Thả phai vào đây</div>
+            <div class="dropzone-subtitle">Hỗ trợ mọi định dạng (Video, Game, ZIP, Tài liệu,...)</div>
             <button type="button" class="btn-select-file" id="btnBrowseFile">
-              <span>+</span> Chọn Tập Tin
+              <span>+</span> Chọn Phai Từ Máy Tính
             </button>
             <input type="file" id="fileInput" class="hidden">
           </div>
 
-          <!-- Preview file -->
+          <!-- Preview phai đã chọn -->
           <div class="file-preview hidden" id="filePreview">
             <div class="file-info">
               <div class="file-ext-badge" id="previewExtBadge">BIN</div>
               <div>
-                <div class="file-name" id="previewFileName">ten_file.zip</div>
+                <div class="file-name" id="previewFileName">ten_phai.zip</div>
                 <div class="file-meta" id="previewFileSize">0 MB</div>
               </div>
             </div>
-            <button type="button" class="btn-remove-file" id="btnRemoveFile" title="Hủy chọn">✕</button>
+            <button type="button" class="btn-remove-file" id="btnRemoveFile" title="Hủy chọn phai">✕</button>
           </div>
 
-          <!-- Tùy chọn -->
+          <!-- Các tùy chọn -->
           <div class="options-form">
             <div class="form-group">
-              <label for="inputPassword">Mật khẩu tải file (Tùy chọn):</label>
+              <label for="inputPassword">Mật khẩu tải phai (Tùy chọn):</label>
               <input type="text" id="inputPassword" class="input-control" placeholder="Để trống nếu không muốn đặt mật khẩu">
             </div>
 
@@ -82,43 +82,54 @@
               <input type="text" id="inputNote" class="input-control" placeholder="Ví dụ: Gửi bạn tài liệu dự án...">
             </div>
 
+            <!-- Nút kích hoạt chia sẻ -->
             <button type="button" class="btn-submit-upload" id="btnStartShare" disabled>
-              <span>TẠO LINK CHIA SẺ TRỰC TIẾP</span>
+              <span>TẢI PHAI LÊN & TẠO LIÊN KẾT</span>
               <span>🚀</span>
             </button>
           </div>
         </div>
 
-        <!-- Bước 2: Hiển thị Link & Đang chia sẻ trực tiếp -->
+        <!-- YÊU CẦU 2: KHI TẢI THÀNH CÔNG -> LẬP TỨC CÓ NÚT SAO CHÉP LIÊN KẾT (KHÔNG CẦN QR) -->
         <div id="senderStepActive" class="hidden" style="text-align: center;">
           
-          <div class="status-pill" id="senderStatusPill">
-            <span class="pulse-dot"></span>
-            <span id="senderStatusText">Đang chờ người nhận mở link...</span>
+          <div class="success-icon" style="width: 56px; height: 56px; background: rgba(16, 185, 129, 0.15); color: #10b981; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; margin: 0 auto 12px;">✓</div>
+          <h2 style="font-size: 19px; color: #fff; margin-bottom: 6px;">Tải Phai Thành Công!</h2>
+          <p style="font-size: 13px; color: var(--text-muted); margin-bottom: 18px;">
+            Liên kết tải phai của bạn đã sẵn sàng để gửi:
+          </p>
+
+          <!-- Hiển thị tên phai vừa tải lên -->
+          <div style="background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border-color); border-radius: var(--radius-sm); padding: 12px 16px; margin-bottom: 18px; text-align: left;">
+            <div style="font-size: 11px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 0.5px;">Phai đang chia sẻ:</div>
+            <div style="font-size: 15px; font-weight: 700; color: #60a5fa; margin-top: 3px; word-break: break-all;" id="senderSharedFileName">ten_phai.zip</div>
+            <div style="font-size: 12.5px; color: var(--text-muted); margin-top: 2px;" id="senderSharedFileSize">0 MB</div>
           </div>
 
-          <div class="link-box">
+          <!-- NÚT SAO CHÉP TO RÕ RÀNG -->
+          <button type="button" class="btn-copy-big" id="btnCopyShareUrl">
+            <span>📋</span>
+            <span id="copyBtnText">SAO CHÉP LIÊN KẾT ĐỂ GỬI</span>
+          </button>
+
+          <!-- Hộp hiển thị đường link liên kết -->
+          <div class="link-box" style="margin-top: 14px;">
             <input type="text" id="shareUrlInput" class="link-input" readonly>
-            <button type="button" class="btn-copy" id="btnCopyShareUrl">
-              <span>📋</span>
-              <span id="copyBtnText">Sao Chép</span>
-            </button>
           </div>
 
-          <!-- Mã QR để quét điện thoại -->
-          <div class="qr-section">
-            <div class="qr-title">📱 Quét mã QR để mở trang tải trên điện thoại:</div>
-            <div class="qr-canvas-container" id="qrContainer"></div>
+          <div class="tab-notice" style="margin-top: 18px;">
+            💡 <strong>Lưu ý:</strong> Dữ liệu truyền trực tiếp từ máy của bạn sang người nhận, xin vui lòng <strong>giữ tab này mở</strong> cho đến khi người nhận tải xong nhé!
           </div>
 
-          <div class="tab-notice">
-            💡 <strong>Lưu ý quan trọng:</strong> Vì file được truyền trực tiếp từ máy của bạn sang người nhận qua P2P, xin vui lòng <strong>giữ tab này mở</strong> cho đến khi người nhận tải xong!
+          <div class="status-pill" id="senderStatusPill" style="margin-top: 10px;">
+            <span class="pulse-dot"></span>
+            <span id="senderStatusText">Đang chờ người nhận mở liên kết...</span>
           </div>
 
           <!-- Tiến trình truyền dữ liệu khi người nhận bắt đầu tải -->
-          <div class="progress-card hidden" id="senderProgressCard">
+          <div class="progress-card hidden" id="senderProgressCard" style="margin-top: 16px;">
             <div class="progress-header">
-              <span style="font-size: 13px; font-weight: 600;" id="senderProgressTitle">Đang gửi dữ liệu...</span>
+              <span style="font-size: 13px; font-weight: 600;" id="senderProgressTitle">Đang truyền dữ liệu...</span>
               <span class="progress-percent" id="senderProgressPercent">0%</span>
             </div>
             <div class="progress-bar-container">
@@ -130,28 +141,39 @@
             </div>
           </div>
 
+          <button type="button" class="btn-nav" id="btnUploadAnother" style="margin-top: 16px; width: 100%; justify-content: center; padding: 10px;">
+            + Chia sẻ phai khác
+          </button>
+
         </div>
 
       </div>
 
       <!-- ================================================ -->
-      <!-- 2. GIAO DIỆN DÀNH CHO NGƯỜI NHẬN (RECEIVER VIEW) -->
+      <!-- 3. GIAO DIỆN DÀNH CHO NGƯỜI NHẬN (RECEIVER VIEW) -->
+      <!-- KHI BẤM VÀO LINK -> CÓ HIỂN THỊ TÊN PHAI VÀ NÚT TẢI PHAI XUỐNG -->
       <!-- ================================================ -->
       <div id="receiverSection" class="hidden">
         
         <!-- Đang kết nối tới người gửi -->
         <div id="receiverConnecting" style="text-align: center; padding: 40px 10px;">
           <div style="font-size: 32px; animation: pulse 1.5s infinite;">⚡</div>
-          <p style="margin-top: 14px; font-weight: 600; color: #fff;">Đang kết nối trực tiếp tới người gửi...</p>
-          <p style="font-size: 12.5px; color: var(--text-muted); margin-top: 6px;">Vui lòng chờ trong giây lát.</p>
+          <p style="margin-top: 14px; font-weight: 600; color: #fff;">Đang kết nối tới người gửi...</p>
+          <p style="font-size: 12.5px; color: var(--text-muted); margin-top: 6px;">Vui lòng chờ lấy thông tin tệp tin trong giây lát.</p>
         </div>
 
-        <!-- Đã kết nối thành công & sẵn sàng tải -->
+        <!-- YÊU CẦU 3: ĐÃ KẾT NỐI -> HIỂN THỊ TÊN PHAI & NÚT TẢI XUỐNG -->
         <div id="receiverReady" class="hidden receiver-card">
           <div class="rc-icon" id="rcFileIcon">📦</div>
-          <h2 class="rc-title" id="rcFileName">Tệp tin</h2>
-          <div class="rc-meta" id="rcFileSize">0 MB</div>
+          
+          <div style="font-size: 12px; text-transform: uppercase; color: var(--text-muted); margin-bottom: 4px; letter-spacing: 0.5px;">
+            Bạn nhận được tệp tin chia sẻ:
+          </div>
+          <!-- HIỂN THỊ TÊN PHAI RÕ RÀNG -->
+          <h2 class="rc-title" id="rcFileName">Tên Phai</h2>
+          <div class="rc-meta" id="rcFileSize">Dung lượng: 0 MB</div>
 
+          <!-- Lời nhắn nếu có -->
           <div class="rc-note hidden" id="rcNoteBox">
             <span id="rcNoteText">"Lời nhắn"</span>
           </div>
@@ -159,7 +181,7 @@
           <!-- Mật khẩu nếu có -->
           <div id="rcPasswordBox" class="hidden" style="margin-bottom: 18px; text-align: left;">
             <label style="font-size: 12.5px; color: var(--text-muted); margin-bottom: 6px; display: block;">
-              🔒 Nhập mật khẩu để mở khóa tệp tin:
+              🔒 Nhập mật khẩu để mở khóa phai:
             </label>
             <input type="password" id="rcInputPassword" class="input-control" placeholder="Nhập mật khẩu...">
             <div id="rcPassError" style="color: var(--danger); font-size: 12px; margin-top: 6px; display: none;">
@@ -167,13 +189,14 @@
             </div>
           </div>
 
+          <!-- NÚT TẢI PHAI XUỐNG -->
           <button type="button" class="btn-download-big" id="btnReceiverDownload">
-            <span>TẢI XUỐNG TỆP TIN</span>
+            <span>TẢI PHAI XUỐNG NGAY</span>
             <span>📥</span>
           </button>
 
           <!-- Tiến trình tải -->
-          <div class="progress-card hidden" id="receiverProgressCard">
+          <div class="progress-card hidden" id="receiverProgressCard" style="margin-top: 18px;">
             <div class="progress-header">
               <span style="font-size: 13px; font-weight: 600;" id="rcProgressTitle">Đang nhận dữ liệu...</span>
               <span class="progress-percent" id="rcProgressPercent">0%</span>
@@ -188,7 +211,7 @@
           </div>
 
           <p style="font-size: 11.5px; color: var(--text-muted); margin-top: 16px;">
-            Mã hóa trực tiếp WebRTC P2P từ trình duyệt của người gửi. Không lưu trên bất kỳ máy chủ nào.
+            Tải trực tiếp tốc độ tối đa từ máy người gửi. An toàn & bảo mật 100%.
           </p>
         </div>
 
@@ -197,9 +220,9 @@
           <div style="font-size: 40px; margin-bottom: 14px;">⚠️</div>
           <h3 style="color: #fff; margin-bottom: 8px;" id="rcErrorTitle">Không Thể Kết Nối</h3>
           <p style="font-size: 13.5px; color: var(--text-muted); margin-bottom: 20px;" id="rcErrorDesc">
-            Người gửi có thể đã đóng trình duyệt hoặc phòng chia sẻ đã hết hạn.
+            Người gửi có thể đã đóng trình duyệt hoặc liên kết đã hết hạn.
           </p>
-          <a href="#" class="btn-nav" id="btnRcHome">Về Trang Chủ Gửi File</a>
+          <a href="#" class="btn-nav" id="btnRcHome">Về Trang Chủ Tải Phai</a>
         </div>
 
       </div>
@@ -209,18 +232,16 @@
 
   <!-- FOOTER -->
   <footer>
-    <p>MyFsend P2P Edition • Lưu trữ và chạy trực tiếp trên <strong>GitHub Pages</strong> • Bảo mật 100%.</p>
+    <p>MyFsend Edition • Chia sẻ phai trực tiếp bằng liên kết • Bảo mật 100%.</p>
   </footer>
 
   <!-- LIBRARIES -->
-  <!-- Sử dụng file peerjs.min.js nội bộ, tự động dự phòng sang CDN unpkg nếu cần -->
   <script src="peerjs.min.js"></script>
   <script>
     if (typeof Peer === "undefined") {
       document.write('<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"><\/script>');
     }
   </script>
-  <script src="qrcode.min.js"></script>
   <script src="app.js"></script>
 </body>
 </html>

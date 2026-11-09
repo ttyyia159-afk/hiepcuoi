@@ -461,6 +461,35 @@ main {
   background: var(--success);
 }
 
+.btn-copy-big {
+  width: 100%;
+  background: linear-gradient(135deg, #ff701e, #ff5b00);
+  color: #fff;
+  border: none;
+  padding: 15px 20px;
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: var(--shadow-glow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: all 0.25s ease;
+}
+
+.btn-copy-big:hover {
+  background: linear-gradient(135deg, #ff8138, #e04e00);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 35px -8px rgba(255, 91, 0, 0.5);
+}
+
+.btn-copy-big.copied {
+  background: var(--success);
+  box-shadow: 0 12px 30px -8px rgba(16, 185, 129, 0.5);
+}
+
 .qr-section {
   display: flex;
   flex-direction: column;

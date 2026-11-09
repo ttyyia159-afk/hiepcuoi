@@ -50,6 +50,10 @@ document.addEventListener("DOMContentLoaded", () => {
     const inputNote = document.getElementById("inputNote");
     const btnStartShare = document.getElementById("btnStartShare");
 
+    const senderSharedFileName = document.getElementById("senderSharedFileName");
+    const senderSharedFileSize = document.getElementById("senderSharedFileSize");
+    const btnUploadAnother = document.getElementById("btnUploadAnother");
+
     const senderStepSelect = document.getElementById("senderStepSelect");
     const senderStepActive = document.getElementById("senderStepActive");
     const senderStatusPill = document.getElementById("senderStatusPill");
@@ -58,7 +62,6 @@ document.addEventListener("DOMContentLoaded", () => {
     const shareUrlInput = document.getElementById("shareUrlInput");
     const btnCopyShareUrl = document.getElementById("btnCopyShareUrl");
     const copyBtnText = document.getElementById("copyBtnText");
-    const qrContainer = document.getElementById("qrContainer");
 
     const senderProgressCard = document.getElementById("senderProgressCard");
     const senderProgressTitle = document.getElementById("senderProgressTitle");
@@ -139,16 +142,9 @@ document.addEventListener("DOMContentLoaded", () => {
         const shareUrl = `${baseUrl}#room=${id}`;
         shareUrlInput.value = shareUrl;
 
-        // Tạo mã QR Code
-        qrContainer.innerHTML = "";
-        if (window.QRCode && window.QRCode.generateCanvas) {
-          try {
-            const canvas = window.QRCode.generateCanvas(shareUrl, 160);
-            qrContainer.appendChild(canvas);
-          } catch (err) {
-            console.error("QR Error:", err);
-          }
-        }
+        // Hiển thị tên phai và dung lượng phai đã chọn
+        if (senderSharedFileName) senderSharedFileName.textContent = selectedFile.name;
+        if (senderSharedFileSize) senderSharedFileSize.textContent = formatBytes(selectedFile.size);
       });
 
       senderPeer.on("error", (err) => {
@@ -261,7 +257,7 @@ document.addEventListener("DOMContentLoaded", () => {
       readNextChunk();
     }
 
-    // Sao chép link
+    // Sao chép link (Nhanh chóng để gửi cho người dùng tải)
     btnCopyShareUrl.addEventListener("click", () => {
       shareUrlInput.select();
       shareUrlInput.setSelectionRange(0, 99999);
@@ -271,12 +267,28 @@ document.addEventListener("DOMContentLoaded", () => {
         document.execCommand("copy");
       }
       btnCopyShareUrl.classList.add("copied");
-      copyBtnText.textContent = "Đã Chép! ✓";
+      copyBtnText.textContent = "✓ ĐÃ SAO CHÉP LIÊN KẾT! HÃY DÁN ĐỂ GỬI";
       setTimeout(() => {
         btnCopyShareUrl.classList.remove("copied");
-        copyBtnText.textContent = "Sao Chép";
-      }, 2000);
+        copyBtnText.textContent = "SAO CHÉP LIÊN KẾT ĐỂ GỬI";
+      }, 2500);
     });
+
+    if (btnUploadAnother) {
+      btnUploadAnother.addEventListener("click", () => {
+        selectedFile = null;
+        fileInput.value = "";
+        filePreview.classList.add("hidden");
+        dropzone.classList.remove("hidden");
+        btnStartShare.disabled = true;
+        btnStartShare.textContent = "TẢI PHAI LÊN & TẠO LIÊN KẾT 🚀";
+        senderStepActive.classList.add("hidden");
+        senderStepSelect.classList.remove("hidden");
+        if (senderPeer) {
+          try { senderPeer.destroy(); } catch (e) {}
+        }
+      });
+    }
   }
 
   // ========================================================
@@ -376,7 +388,7 @@ document.addEventListener("DOMContentLoaded", () => {
           a.click();
           document.body.removeChild(a);
 
-          btnReceiverDownload.textContent = "✓ ĐÃ LƯU TỆP TIN XUỐNG MÁY";
+          btnReceiverDownload.textContent = "✓ ĐÃ TẢI PHAI XUỐNG THÀNH CÔNG";
           btnReceiverDownload.style.background = "var(--success)";
         }
       });
@@ -400,8 +412,9 @@ document.addEventListener("DOMContentLoaded", () => {
       receiverConnecting.classList.add("hidden");
       receiverReady.classList.remove("hidden");
 
+      document.title = "Tải phai: " + meta.name + " - MyFsend";
       rcFileName.textContent = meta.name;
-      rcFileSize.textContent = formatBytes(meta.size);
+      rcFileSize.textContent = "Dung lượng: " + formatBytes(meta.size);
       const ext = (meta.name.split(".").pop() || "").toUpperCase();
       rcFileIcon.textContent = getFileIconEmoji(ext);
 
