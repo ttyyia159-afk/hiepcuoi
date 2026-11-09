@@ -1,54 +1,62 @@
 /**
- * MyFsend P2P - JavaScript truyền file trực tiếp qua WebRTC (DataChannel)
- * Hỗ trợ STUN & TURN Relay Server để xuyên tường lửa, NAT, mạng 4G
- * Tích hợp cơ chế Keep-Alive (Heartbeat) và tự động kết nối lại khi chờ lâu
+ * MyFsend - Ứng dụng chia sẻ phai chạy trên nền tảng Firebase & Google Cloud
+ * Tự động tải phai lên Cloud Storage và lưu thông tin vào Firestore Database.
  */
 
-document.addEventListener("DOMContentLoaded", () => {
-  // Cảnh báo nếu mở trực tiếp bằng file://
-  if (window.location.protocol === "file:") {
-    const alertDiv = document.createElement("div");
-    alertDiv.style.cssText = "background:#ef4444;color:#fff;padding:14px;text-align:center;font-weight:600;font-size:13.5px;position:sticky;top:0;z-index:9999;";
-    alertDiv.innerHTML = "⚠️ <strong>CHÚ Ý:</strong> Bạn đang mở tệp tin cục bộ (file://). Liên kết này không thể gửi cho máy khác tải được. Hãy đưa thư mục này lên GitHub Pages (xem file HUONG_DAN_GITHUB.md)!";
-    document.body.insertBefore(alertDiv, document.body.firstChild);
+// Import các thư viện chính thức của Firebase từ Google CDN
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { 
+  getStorage, 
+  ref, 
+  uploadBytesResumable, 
+  getDownloadURL 
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import { 
+  getFirestore, 
+  doc, 
+  setDoc, 
+  getDoc 
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// =========================================================================
+// 🔑 BƯỚC QUAN TRỌNG: DÁN CẤU HÌNH DỰ ÁN FIREBASE CỦA BẠN VÀO ĐÂY
+// (Xem hướng dẫn chi tiết cách lấy mã này ở file HUONG_DAN_FIREBASE.md)
+// =========================================================================
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  storageBucket: "YOUR_PROJECT_ID.appspot.com",
+  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+  appId: "YOUR_APP_ID"
+};
+
+// Kiểm tra xem người dùng đã cấu hình Firebase chưa
+const isConfigured = firebaseConfig.apiKey !== "YOUR_API_KEY";
+if (!isConfigured) {
+  const configWarning = document.getElementById("configWarning");
+  if (configWarning) configWarning.classList.remove("hidden");
+  console.warn("Chưa cấu hình Firebase! Hãy dán firebaseConfig vào file app.js");
+}
+
+let app, storage, db;
+if (isConfigured) {
+  try {
+    app = initializeApp(firebaseConfig);
+    storage = getStorage(app);
+    db = getFirestore(app);
+  } catch (err) {
+    console.error("Lỗi khởi tạo Firebase:", err);
   }
+}
 
-  // Cấu hình STUN và TURN Relay Server (OpenRelay miễn phí) giúp kết nối xuyên qua 4G, Wifi khác nhau
-  const peerConfig = {
-    debug: 1,
-    config: {
-      iceServers: [
-        { urls: "stun:stun.l.google.com:19302" },
-        { urls: "stun:stun1.l.google.com:19302" },
-        { urls: "stun:stun2.l.google.com:19302" },
-        { urls: "stun:openrelay.metered.ca:80" },
-        {
-          urls: "turn:openrelay.metered.ca:80",
-          username: "openrelayproject",
-          credential: "openrelayproject"
-        },
-        {
-          urls: "turn:openrelay.metered.ca:443",
-          username: "openrelayproject",
-          credential: "openrelayproject"
-        },
-        {
-          urls: "turn:openrelay.metered.ca:443?transport=tcp",
-          username: "openrelayproject",
-          credential: "openrelayproject"
-        }
-      ]
-    }
-  };
+document.addEventListener("DOMContentLoaded", () => {
+  // Kiểm tra ID phai trên liên kết: #d=xyz hoặc ?d=xyz
+  const fileId = getFileIdFromUrl();
 
-  const CHUNK_SIZE = 64 * 1024; // 64 KB mỗi mảnh dữ liệu
-
-  // Kiểm tra Room ID trên URL: #room=xyz hoặc ?room=xyz
-  let targetRoomId = getRoomIdFromUrl();
-
-  if (targetRoomId) {
+  if (fileId) {
     // Chế độ: Người nhận (Receiver)
-    initReceiver(targetRoomId);
+    initReceiver(fileId);
   } else {
     // Chế độ: Người gửi (Sender)
     initSender();
@@ -72,35 +80,27 @@ document.addEventListener("DOMContentLoaded", () => {
     const previewExtBadge = document.getElementById("previewExtBadge");
     const btnRemoveFile = document.getElementById("btnRemoveFile");
 
-    const inputPassword = document.getElementById("inputPassword");
     const inputNote = document.getElementById("inputNote");
-    const btnStartShare = document.getElementById("btnStartShare");
-
-    const senderSharedFileName = document.getElementById("senderSharedFileName");
-    const senderSharedFileSize = document.getElementById("senderSharedFileSize");
-    const btnUploadAnother = document.getElementById("btnUploadAnother");
+    const btnStartUpload = document.getElementById("btnStartUpload");
 
     const senderStepSelect = document.getElementById("senderStepSelect");
-    const senderStepActive = document.getElementById("senderStepActive");
-    const senderStatusPill = document.getElementById("senderStatusPill");
-    const senderStatusText = document.getElementById("senderStatusText");
+    const senderStepUploading = document.getElementById("senderStepUploading");
+    const senderStepSuccess = document.getElementById("senderStepSuccess");
 
+    const uploadProgressBar = document.getElementById("uploadProgressBar");
+    const uploadProgressStats = document.getElementById("uploadProgressStats");
+    const uploadProgressPercent = document.getElementById("uploadProgressPercent");
+
+    const successFileName = document.getElementById("successFileName");
+    const successFileSize = document.getElementById("successFileSize");
     const shareUrlInput = document.getElementById("shareUrlInput");
     const btnCopyShareUrl = document.getElementById("btnCopyShareUrl");
     const copyBtnText = document.getElementById("copyBtnText");
-
-    const senderProgressCard = document.getElementById("senderProgressCard");
-    const senderProgressTitle = document.getElementById("senderProgressTitle");
-    const senderProgressPercent = document.getElementById("senderProgressPercent");
-    const senderProgressBar = document.getElementById("senderProgressBar");
-    const senderProgressStats = document.getElementById("senderProgressStats");
-    const senderSpeedStats = document.getElementById("senderSpeedStats");
+    const btnUploadAnother = document.getElementById("btnUploadAnother");
 
     let selectedFile = null;
-    let senderPeer = null;
-    let heartbeatInterval = null;
 
-    // Chọn file
+    // Chọn phai
     btnBrowseFile.addEventListener("click", () => fileInput.click());
     dropzone.addEventListener("click", () => fileInput.click());
 
@@ -139,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       dropzone.classList.add("hidden");
       filePreview.classList.remove("hidden");
-      btnStartShare.disabled = false;
+      btnStartUpload.disabled = false;
     }
 
     btnRemoveFile.addEventListener("click", (e) => {
@@ -148,171 +148,83 @@ document.addEventListener("DOMContentLoaded", () => {
       fileInput.value = "";
       filePreview.classList.add("hidden");
       dropzone.classList.remove("hidden");
-      btnStartShare.disabled = true;
+      btnStartUpload.disabled = true;
     });
 
-    // Bắt đầu tạo kết nối chia sẻ
-    btnStartShare.addEventListener("click", () => {
+    // Bắt đầu tải phai lên máy chủ Google Cloud Storage
+    btnStartUpload.addEventListener("click", async () => {
       if (!selectedFile) return;
 
-      btnStartShare.disabled = true;
-      btnStartShare.textContent = "Đang khởi tạo kết nối P2P...";
-
-      // Khởi tạo Peer với ID ngẫu nhiên rõ ràng
-      const customRoomId = "fs-" + Math.random().toString(36).substring(2, 8);
-      senderPeer = new Peer(customRoomId, peerConfig);
-
-      senderPeer.on("open", (id) => {
-        senderStepSelect.classList.add("hidden");
-        senderStepActive.classList.remove("hidden");
-
-        const baseUrl = window.location.href.split("#")[0].split("?")[0];
-        const shareUrl = `${baseUrl}#room=${id}`;
-        shareUrlInput.value = shareUrl;
-
-        if (senderSharedFileName) senderSharedFileName.textContent = selectedFile.name;
-        if (senderSharedFileSize) senderSharedFileSize.textContent = formatBytes(selectedFile.size);
-
-        // Kích hoạt Heartbeat (Ping định kỳ mỗi 10 giây để máy chủ định tuyến không bao giờ ngắt kết nối khi chờ lâu)
-        if (heartbeatInterval) clearInterval(heartbeatInterval);
-        heartbeatInterval = setInterval(() => {
-          if (senderPeer && !senderPeer.destroyed) {
-            if (senderPeer.socket && senderPeer.socket._socket && senderPeer.socket._socket.readyState === 1) {
-              senderPeer.socket._send({ type: "HEARTBEAT" });
-            }
-          }
-        }, 10000);
-      });
-
-      // Tự động kết nối lại nếu bị mất mạng hoặc bị broker ngắt
-      senderPeer.on("disconnected", () => {
-        console.log("Mất kết nối định tuyến tạm thời. Đang kết nối lại...");
-        if (senderPeer && !senderPeer.destroyed) {
-          senderPeer.reconnect();
-        }
-      });
-
-      senderPeer.on("error", (err) => {
-        console.error("Sender Peer Error:", err);
-        // Nếu lỗi ID bị trùng, tự tạo lại ID khác
-        if (err.type === "unavailable-id") {
-          const newId = "fs-" + Math.random().toString(36).substring(2, 9);
-          senderPeer = new Peer(newId, peerConfig);
-        }
-      });
-
-      // Lắng nghe kết nối từ người nhận
-      senderPeer.on("connection", (conn) => {
-        function sendMetadata() {
-          senderStatusPill.classList.add("status-connected");
-          senderStatusText.textContent = "⚡ Người nhận đã kết nối! Đang gửi thông tin phai...";
-
-          conn.send({
-            type: "metadata",
-            name: selectedFile.name,
-            size: selectedFile.size,
-            hasPassword: !!inputPassword.value.trim(),
-            note: inputNote.value.trim()
-          });
-        }
-
-        if (conn.open) {
-          sendMetadata();
-        } else {
-          conn.on("open", sendMetadata);
-        }
-
-        // Xử lý tín hiệu từ người nhận
-        conn.on("data", (msg) => {
-          if (!msg) return;
-
-          if (msg.type === "request-metadata") {
-            sendMetadata();
-          } else if (msg.type === "verify-password") {
-            const correctPass = inputPassword.value.trim();
-            if (msg.password === correctPass) {
-              conn.send({ type: "password-result", success: true });
-            } else {
-              conn.send({ type: "password-result", success: false });
-            }
-          } else if (msg.type === "start-download") {
-            // Bắt đầu truyền dữ liệu theo từng mảnh
-            sendFileData(conn, selectedFile);
-          }
-        });
-
-        conn.on("close", () => {
-          senderStatusPill.classList.remove("status-connected");
-          senderStatusText.textContent = "Đang chờ người nhận mở liên kết...";
-        });
-      });
-    });
-
-    // Hàm đọc và truyền dữ liệu theo chunk để tránh nghẽn băng thông và tràn RAM
-    function sendFileData(conn, file) {
-      senderProgressCard.classList.remove("hidden");
-      senderProgressTitle.textContent = "Đang truyền tệp tin sang người nhận...";
-
-      let offset = 0;
-      const totalSize = file.size;
-      const startTime = Date.now();
-      let lastTime = startTime;
-      let lastLoaded = 0;
-
-      function readNextChunk() {
-        if (offset >= totalSize) {
-          conn.send({ type: "complete" });
-          senderProgressPercent.textContent = "100%";
-          senderProgressBar.style.width = "100%";
-          senderProgressTitle.textContent = "✓ Đã gửi tệp tin thành công!";
-          return;
-        }
-
-        // Kiểm tra buffer của WebRTC DataChannel để không bị tràn hàng đợi
-        if (conn.dataChannel && conn.dataChannel.bufferedAmount > 1024 * 512) {
-          setTimeout(readNextChunk, 40);
-          return;
-        }
-
-        const slice = file.slice(offset, offset + CHUNK_SIZE);
-        const reader = new FileReader();
-
-        reader.onload = (e) => {
-          conn.send({
-            type: "chunk",
-            data: e.target.result,
-            offset: offset,
-            total: totalSize
-          });
-
-          offset += e.target.result.byteLength;
-
-          // Cập nhật tiến trình trên giao diện người gửi
-          const percent = Math.min(100, Math.round((offset / totalSize) * 100));
-          senderProgressPercent.textContent = percent + "%";
-          senderProgressBar.style.width = percent + "%";
-          senderProgressStats.textContent = `${formatBytes(offset)} / ${formatBytes(totalSize)}`;
-
-          const now = Date.now();
-          const duration = (now - lastTime) / 1000;
-          if (duration >= 0.5) {
-            const bytesDiff = offset - lastLoaded;
-            const speed = bytesDiff / duration;
-            senderSpeedStats.textContent = formatBytes(speed) + "/s";
-            lastLoaded = offset;
-            lastTime = now;
-          }
-
-          readNextChunk();
-        };
-
-        reader.readAsArrayBuffer(slice);
+      if (!isConfigured) {
+        alert("Bạn chưa dán mã cấu hình Firebase vào file app.js! Vui lòng làm theo hướng dẫn trong file HUONG_DAN_FIREBASE.md trước khi tải phai nhé.");
+        return;
       }
 
-      readNextChunk();
-    }
+      senderStepSelect.classList.add("hidden");
+      senderStepUploading.classList.remove("hidden");
 
-    // Sao chép link để gửi cho người nhận
+      uploadProgressBar.style.width = "0%";
+      uploadProgressPercent.textContent = "0%";
+      uploadProgressStats.textContent = `0 MB / ${formatBytes(selectedFile.size)}`;
+
+      // Tạo mã định danh duy nhất cho phai
+      const newFileId = "fs-" + Math.random().toString(36).substring(2, 9);
+      const cleanFileName = selectedFile.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const storageRef = ref(storage, `uploads/${newFileId}/${cleanFileName}`);
+
+      // Thực hiện upload lên Cloud Storage với thanh tiến trình
+      const uploadTask = uploadBytesResumable(storageRef, selectedFile);
+
+      uploadTask.on(
+        "state_changed",
+        (snapshot) => {
+          const progress = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+          uploadProgressBar.style.width = progress + "%";
+          uploadProgressPercent.textContent = progress + "%";
+          uploadProgressStats.textContent = `${formatBytes(snapshot.bytesTransferred)} / ${formatBytes(snapshot.totalBytes)}`;
+        },
+        (error) => {
+          console.error("Lỗi khi tải phai lên:", error);
+          alert("Lỗi tải phai lên Firebase: " + error.message);
+          senderStepUploading.classList.add("hidden");
+          senderStepSelect.classList.remove("hidden");
+        },
+        async () => {
+          // Khi tải lên Google Cloud thành công: Lấy link download trực tiếp
+          try {
+            const directDownloadUrl = await getDownloadURL(uploadTask.snapshot.ref);
+
+            // Lưu thông tin tệp tin vào Firestore Database
+            await setDoc(doc(db, "files", newFileId), {
+              name: selectedFile.name,
+              size: selectedFile.size,
+              downloadUrl: directDownloadUrl,
+              note: inputNote.value.trim(),
+              createdAt: new Date().toISOString()
+            });
+
+            // Chuyển sang màn hình thành công
+            senderStepUploading.classList.add("hidden");
+            senderStepSuccess.classList.remove("hidden");
+
+            successFileName.textContent = selectedFile.name;
+            successFileSize.textContent = formatBytes(selectedFile.size);
+
+            const baseUrl = window.location.href.split("#")[0].split("?")[0];
+            const shareUrl = `${baseUrl}#d=${newFileId}`;
+            shareUrlInput.value = shareUrl;
+
+          } catch (err) {
+            console.error("Lỗi lưu thông tin:", err);
+            alert("Lỗi lưu thông tin phai: " + err.message);
+            senderStepUploading.classList.add("hidden");
+            senderStepSelect.classList.remove("hidden");
+          }
+        }
+      );
+    });
+
+    // Nút Sao chép liên kết để gửi cho bạn bè (Không cần quét QR)
     btnCopyShareUrl.addEventListener("click", () => {
       shareUrlInput.select();
       shareUrlInput.setSelectionRange(0, 99999);
@@ -322,41 +234,35 @@ document.addEventListener("DOMContentLoaded", () => {
         document.execCommand("copy");
       }
       btnCopyShareUrl.classList.add("copied");
-      copyBtnText.textContent = "✓ ĐÃ SAO CHÉP LIÊN KẾT! HÃY DÁN ĐỂ GỬI";
+      copyBtnText.textContent = "✓ ĐÃ SAO CHÉP LIÊN KẾT THÀNH CÔNG! HÃY DÁN ĐỂ GỬI";
       setTimeout(() => {
         btnCopyShareUrl.classList.remove("copied");
-        copyBtnText.textContent = "SAO CHÉP LIÊN KẾT ĐỂ GỬI";
+        copyBtnText.textContent = "SAO CHÉP LIÊN KẾT ĐỂ GỬI CHO BẠN BÈ";
       }, 2500);
     });
 
-    if (btnUploadAnother) {
-      btnUploadAnother.addEventListener("click", () => {
-        if (heartbeatInterval) clearInterval(heartbeatInterval);
-        selectedFile = null;
-        fileInput.value = "";
-        filePreview.classList.add("hidden");
-        dropzone.classList.remove("hidden");
-        btnStartShare.disabled = true;
-        btnStartShare.textContent = "TẢI PHAI LÊN & TẠO LIÊN KẾT 🚀";
-        senderStepActive.classList.add("hidden");
-        senderStepSelect.classList.remove("hidden");
-        if (senderPeer) {
-          try { senderPeer.destroy(); } catch (e) {}
-        }
-      });
-    }
+    btnUploadAnother.addEventListener("click", () => {
+      selectedFile = null;
+      fileInput.value = "";
+      inputNote.value = "";
+      filePreview.classList.add("hidden");
+      dropzone.classList.remove("hidden");
+      btnStartUpload.disabled = true;
+      senderStepSuccess.classList.add("hidden");
+      senderStepSelect.classList.remove("hidden");
+    });
   }
 
   // ========================================================
   // 2. LOGIC DÀNH CHO NGƯỜI NHẬN (RECEIVER)
   // ========================================================
-  function initReceiver(roomId) {
+  async function initReceiver(fileId) {
     const senderSection = document.getElementById("senderSection");
     const receiverSection = document.getElementById("receiverSection");
     senderSection.classList.add("hidden");
     receiverSection.classList.remove("hidden");
 
-    const receiverConnecting = document.getElementById("receiverConnecting");
+    const receiverLoading = document.getElementById("receiverLoading");
     const receiverReady = document.getElementById("receiverReady");
     const receiverError = document.getElementById("receiverError");
 
@@ -365,192 +271,55 @@ document.addEventListener("DOMContentLoaded", () => {
     const rcFileSize = document.getElementById("rcFileSize");
     const rcNoteBox = document.getElementById("rcNoteBox");
     const rcNoteText = document.getElementById("rcNoteText");
+    const btnDownloadFile = document.getElementById("btnDownloadFile");
 
-    const rcPasswordBox = document.getElementById("rcPasswordBox");
-    const rcInputPassword = document.getElementById("rcInputPassword");
-    const rcPassError = document.getElementById("rcPassError");
-    const btnReceiverDownload = document.getElementById("btnReceiverDownload");
-
-    const receiverProgressCard = document.getElementById("receiverProgressCard");
-    const rcProgressTitle = document.getElementById("rcProgressTitle");
-    const rcProgressPercent = document.getElementById("rcProgressPercent");
-    const rcProgressBar = document.getElementById("rcProgressBar");
-    const rcProgressStats = document.getElementById("rcProgressStats");
-    const rcSpeedStats = document.getElementById("rcSpeedStats");
-
-    let receiverPeer = null;
-    let connection = null;
-    let fileMeta = null;
-    let receivedChunks = [];
-    let receivedBytes = 0;
-    let lastTime = Date.now();
-    let lastLoaded = 0;
-    let retryCount = 0;
-    const MAX_RETRIES = 3;
-
-    function connectToSender() {
-      if (receiverPeer) {
-        try { receiverPeer.destroy(); } catch (e) {}
-      }
-
-      receiverPeer = new Peer(peerConfig);
-
-      receiverPeer.on("open", () => {
-        // Kết nối tới Peer ID của người gửi
-        connection = receiverPeer.connect(roomId, {
-          reliable: true
-        });
-
-        connection.on("open", () => {
-          // Khi kết nối mở, yêu cầu người gửi gửi lại metadata nếu chưa nhận được
-          connection.send({ type: "request-metadata" });
-        });
-
-        connection.on("data", (msg) => {
-          if (!msg) return;
-
-          if (msg.type === "metadata") {
-            fileMeta = msg;
-            renderReceiverMeta(msg);
-          } else if (msg.type === "password-result") {
-            if (msg.success) {
-              rcPassError.style.display = "none";
-              startDownloading();
-            } else {
-              rcPassError.style.display = "block";
-              btnReceiverDownload.disabled = false;
-              btnReceiverDownload.textContent = "TẢI PHAI XUỐNG NGAY 📥";
-            }
-          } else if (msg.type === "chunk") {
-            // Nhận 1 mảnh dữ liệu
-            receivedChunks.push(msg.data);
-            receivedBytes += msg.data.byteLength;
-
-            const total = msg.total;
-            const percent = Math.min(100, Math.round((receivedBytes / total) * 100));
-            rcProgressPercent.textContent = percent + "%";
-            rcProgressBar.style.width = percent + "%";
-            rcProgressStats.textContent = `${formatBytes(receivedBytes)} / ${formatBytes(total)}`;
-
-            const now = Date.now();
-            const duration = (now - lastTime) / 1000;
-            if (duration >= 0.5) {
-              const speed = (receivedBytes - lastLoaded) / duration;
-              rcSpeedStats.textContent = formatBytes(speed) + "/s";
-              lastLoaded = receivedBytes;
-              lastTime = now;
-            }
-          } else if (msg.type === "complete") {
-            // Hoàn tất tải!
-            rcProgressTitle.textContent = "✓ Tải phai hoàn tất!";
-            rcProgressPercent.textContent = "100%";
-            rcProgressBar.style.width = "100%";
-
-            // Ghép các chunk thành Blob và kích hoạt tải về máy
-            const blob = new Blob(receivedChunks);
-            const dlUrl = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = dlUrl;
-            a.download = fileMeta.name;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-
-            btnReceiverDownload.textContent = "✓ ĐÃ TẢI PHAI XUỐNG THÀNH CÔNG";
-            btnReceiverDownload.style.background = "var(--success)";
-          }
-        });
-
-        connection.on("close", () => {
-          if (receivedBytes < (fileMeta ? fileMeta.size : 1)) {
-            showReceiverError("Mất Kết Nối", "Người gửi đã đóng trang web hoặc kết nối mạng bị gián đoạn.");
-          }
-        });
-
-        connection.on("error", (err) => {
-          console.error("Connection Error:", err);
-        });
-      });
-
-      receiverPeer.on("error", (err) => {
-        console.error("Receiver Peer Error:", err);
-        // Nếu người gửi tạm thời đang reconnect, thử kết nối lại tối đa 3 lần
-        if (err.type === "peer-unavailable" && retryCount < MAX_RETRIES) {
-          retryCount++;
-          console.log(`Đang thử kết nối lại tới người gửi (Lần ${retryCount}/${MAX_RETRIES})...`);
-          setTimeout(connectToSender, 2000);
-        } else {
-          showReceiverError("Không Thể Kết Nối Tới Người Gửi", "Không tìm thấy phòng kết nối hoặc người gửi chưa mở trang web chia sẻ.");
-        }
-      });
-    }
-
-    connectToSender();
-
-    function renderReceiverMeta(meta) {
-      receiverConnecting.classList.add("hidden");
-      receiverReady.classList.remove("hidden");
-
-      document.title = "Tải phai: " + meta.name + " - MyFsend";
-      rcFileName.textContent = meta.name;
-      rcFileSize.textContent = "Dung lượng: " + formatBytes(meta.size);
-      const ext = (meta.name.split(".").pop() || "").toUpperCase();
-      rcFileIcon.textContent = getFileIconEmoji(ext);
-
-      if (meta.note) {
-        rcNoteBox.classList.remove("hidden");
-        rcNoteText.textContent = `“${meta.note}”`;
-      }
-
-      if (meta.hasPassword) {
-        rcPasswordBox.classList.remove("hidden");
-      }
-    }
-
-    btnReceiverDownload.addEventListener("click", () => {
-      if (!connection) return;
-
-      btnReceiverDownload.disabled = true;
-      btnReceiverDownload.textContent = "Đang chuẩn bị tải...";
-
-      if (fileMeta && fileMeta.hasPassword) {
-        const pass = rcInputPassword.value.trim();
-        if (!pass) {
-          rcPassError.textContent = "Vui lòng nhập mật khẩu!";
-          rcPassError.style.display = "block";
-          btnReceiverDownload.disabled = false;
-          btnReceiverDownload.textContent = "TẢI PHAI XUỐNG NGAY 📥";
-          return;
-        }
-        connection.send({ type: "verify-password", password: pass });
-      } else {
-        startDownloading();
-      }
-    });
-
-    function startDownloading() {
-      receiverProgressCard.classList.remove("hidden");
-      rcProgressTitle.textContent = "Đang nhận tệp tin từ người gửi...";
-      receivedChunks = [];
-      receivedBytes = 0;
-      lastTime = Date.now();
-      lastLoaded = 0;
-
-      // Báo người gửi bắt đầu đẩy dữ liệu
-      connection.send({ type: "start-download" });
-    }
-
-    function showReceiverError(title, desc) {
-      receiverConnecting.classList.add("hidden");
-      receiverReady.classList.add("hidden");
+    if (!isConfigured) {
+      receiverLoading.classList.add("hidden");
       receiverError.classList.remove("hidden");
-      document.getElementById("rcErrorTitle").textContent = title;
-      document.getElementById("rcErrorDesc").textContent = desc;
+      return;
+    }
+
+    try {
+      // Lấy thông tin phai từ Firestore Database
+      const fileDoc = await getDoc(doc(db, "files", fileId));
+
+      if (fileDoc.exists()) {
+        const data = fileDoc.data();
+
+        receiverLoading.classList.add("hidden");
+        receiverReady.classList.remove("hidden");
+
+        document.title = "Tải phai: " + data.name + " - MyFsend";
+        // Hiển thị tên phai và dung lượng rõ ràng cho người nhận
+        rcFileName.textContent = data.name;
+        rcFileSize.textContent = "Dung lượng: " + formatBytes(data.size);
+
+        const ext = (data.name.split(".").pop() || "").toUpperCase();
+        rcFileIcon.textContent = getFileIconEmoji(ext);
+
+        if (data.note) {
+          rcNoteBox.classList.remove("hidden");
+          rcNoteText.textContent = `“${data.note}”`;
+        }
+
+        // Gán link tải trực tiếp từ máy chủ Google Cloud
+        btnDownloadFile.href = data.downloadUrl;
+        btnDownloadFile.setAttribute("download", data.name);
+
+      } else {
+        receiverLoading.classList.add("hidden");
+        receiverError.classList.remove("hidden");
+      }
+    } catch (err) {
+      console.error("Lỗi lấy thông tin phai:", err);
+      receiverLoading.classList.add("hidden");
+      receiverError.classList.remove("hidden");
     }
 
     document.getElementById("btnRcHome").addEventListener("click", (e) => {
       e.preventDefault();
       window.location.hash = "";
+      window.location.search = "";
       window.location.reload();
     });
   }
@@ -558,16 +327,16 @@ document.addEventListener("DOMContentLoaded", () => {
   // ========================================================
   // 3. TIỆN ÍCH DÙNG CHUNG
   // ========================================================
-  function getRoomIdFromUrl() {
-    // 1. Kiểm tra hash: #room=xyz
+  function getFileIdFromUrl() {
+    // 1. Kiểm tra hash: #d=xyz
     const hash = window.location.hash;
-    if (hash && hash.includes("room=")) {
-      const match = hash.match(/room=([a-zA-Z0-9_-]+)/);
+    if (hash && hash.includes("d=")) {
+      const match = hash.match(/d=([a-zA-Z0-9_-]+)/);
       if (match && match[1]) return match[1];
     }
-    // 2. Kiểm tra query param: ?room=xyz
+    // 2. Kiểm tra query param: ?d=xyz
     const params = new URLSearchParams(window.location.search);
-    return params.get("room") || "";
+    return params.get("d") || "";
   }
 
   function formatBytes(bytes, decimals = 2) {
@@ -594,7 +363,7 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Nút gửi tệp mới trên header
+  // Nút gửi phai mới trên header
   const btnNewShare = document.getElementById("btnNewShare");
   const logoReload = document.getElementById("logoReload");
   [btnNewShare, logoReload].forEach(el => {
